@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'work.lclpnet:lclpnetwork.api:1.0.0'
+    implementation 'work.lclpnet:lclpnetwork-api:1.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
@@ -51,4 +51,38 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'mcserver-api'
+            from components.java
+
+            pom {
+                name = 'MCServerAPI'
+                description = 'A Java library to manage Minecraft server backend interaction with LCLPNetwork.'
+            }
+        }
+    }
+    repositories {
+        maven {
+            if (privateProps.containsKey('mavenPassword')
+                    && privateProps.containsKey('mavenHost')
+                    && privateProps.containsKey('mavenUser')) {
+                credentials {
+                    username privateProps.getProperty('mavenUser');
+                    password privateProps.getProperty('mavenPassword');
+                }
+                url privateProps.getProperty('mavenHost');
+            } else {
+                url "file:///${project.projectDir}/repo"
+            }
+        }
+    }
 }
