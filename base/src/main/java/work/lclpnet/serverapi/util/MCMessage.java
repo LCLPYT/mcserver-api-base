@@ -38,10 +38,10 @@ public class MCMessage {
 
     /* */
 
-    private ColorMode colorMode;
-    private MessageStyle style;
-    private String text = null;
-    private final List<MCMessage> children = new ArrayList<>();
+    protected ColorMode colorMode;
+    protected MessageStyle style;
+    protected String text = null;
+    protected final List<MCMessage> children = new ArrayList<>();
 
     public MCMessage(MessageColor color, ColorMode colorMode) {
         this(new MessageStyle(color), colorMode);
@@ -202,6 +202,15 @@ public class MCMessage {
         );
     }
 
+    @Override
+    public String toString() {
+        return "MCMessage{" + "colorMode=" + colorMode +
+                ", style=" + style +
+                ", text='" + text + '\'' +
+                ", children=" + children +
+                '}';
+    }
+
     /**
      * @return A new blank message.
      */
@@ -236,7 +245,7 @@ public class MCMessage {
      */
     public static class MCTranslationMessage extends MCMessage {
 
-        private List<MCMessage> substitutes = new ArrayList<>();
+        protected List<MCMessage> substitutes = new ArrayList<>();
 
         public MCTranslationMessage(MessageColor color, ColorMode colorMode) {
             super(color, colorMode);
@@ -251,6 +260,15 @@ public class MCMessage {
             return this;
         }
 
+        @Override
+        public String toString() {
+            return "MCTranslationMessage{" + "colorMode=" + colorMode +
+                    ", style=" + style +
+                    ", text='" + text + '\'' +
+                    ", children=" + children +
+                    ", substitutes=" + substitutes +
+                    '}';
+        }
     }
 
     public enum ColorMode {
@@ -331,6 +349,19 @@ public class MCMessage {
             this.reset = reset;
             return this;
         }
+
+        @Override
+        public String toString() {
+            return "MessageStyle{" +
+                    "color=" + color +
+                    ", obfuscated=" + obfuscated +
+                    ", bold=" + bold +
+                    ", strikethrough=" + strikethrough +
+                    ", underline=" + underline +
+                    ", italic=" + italic +
+                    ", reset=" + reset +
+                    '}';
+        }
     }
 
     public static class MessageColor {
@@ -365,6 +396,10 @@ public class MCMessage {
             this.blue = blue;
         }
 
+        @Override
+        public String toString() {
+            return String.format("rgb(%s; %s; %s)", this.red, this.green, this.blue);
+        }
     }
 
 }
