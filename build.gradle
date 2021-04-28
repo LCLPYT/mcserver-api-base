@@ -4,6 +4,10 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
+import org.ajoberstar.grgit.Tag
+
+
+
 plugins {
     id 'org.ajoberstar.grgit' version '4.1.0'
 }
@@ -27,3 +31,13 @@ ext {
     }
     PRIVATE = privateProps
 }
+
+def headId = grgit.head().id
+def headTag = null
+
+grgit.tag.list().forEach {
+    def tag = it as Tag
+    if(tag.commit.id == headId) headTag = tag;
+}
+
+println headTag
