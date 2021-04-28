@@ -1,0 +1,7 @@
+name: MCServerAPI
+version: @version@
+main: work.lclpnet.serverimpl.bukkit.MCServerBukkit
+api-version: 1.14
+authors: [ LCLP ]
+description: LCLPNetwork integration for Minecraft Bukkit servers.
+website: https://lclpnet.work

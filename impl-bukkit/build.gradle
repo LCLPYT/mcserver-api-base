@@ -3,10 +3,12 @@
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
 def getVersion(boolean strict = false) {
@@ -28,11 +30,43 @@ group 'work.lclpnet.mcserver-api'
 archivesBaseName = 'mcserver-api-bukkit'
 version getVersion()
 
+sourceCompatibility = targetCompatibility = '1.8'
+
 repositories {
     mavenCentral()
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven { url = 'https://repo.lclpnet.work/repository/internal' }
+    maven {
+        if (!privateProps.containsKey('mavenPassword')
+                || !privateProps.containsKey('mavenHost')
+                || !privateProps.containsKey('mavenUser')) {
+            throw new IllegalStateException('Private properties must contain values for "mavenPassword", "mavenHost" and "mavenUser".')
+        }
+        credentials {
+            username privateProps.getProperty('mavenUser');
+            password privateProps.getProperty('mavenPassword');
+        }
+        url privateProps.getProperty('mavenHost');
+    }
 }
 
 dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
+    implementation 'work.lclpnet:lclpnetwork-api:1.0.2'
+    implementation 'work.lclpnet.mcserver-api:mcserver-api-base:0.2.0'
+    implementation 'work.lclpnet:lclpstorage:1.0.0'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
@@ -46,10 +80,22 @@ java {
     withSourcesJar()
 }
 
-tasks.publish.dependsOn({
-    def versionTest = getVersion(true)
-    println("Publishing version '${versionTest}'...")
-})
+shadowJar {
+    dependencies {
+        include(dependency('work.lclpnet:lclpnetwork-api:.*'))
+        include(dependency('work.lclpnet.mcserver-api:mcserver-api-base:.*'))
+        include(dependency('work.lclpnet:lclpstorage:.*'))
+    }
+
+    // Relocate to prevent conflicts with other mods that include it
+    relocate 'work.lclpnet.lclpnetwork', 'mcsapi.work.lclpnet.lclpnetwork'
+    relocate 'work.lclpnet.serverapi', 'mcsapi.work.lclpnet.serverapi'
+    relocate 'work.lclpnet.storage', 'mcsapi.work.lclpnet.storage'
+
+    archiveClassifier.set('') // Replace the default JAR
+}
+
+tasks.build.dependsOn('shadowJar')
 
 publishing {
     publications {
@@ -77,5 +123,16 @@ publishing {
                 url "file:///${project.projectDir}/repo"
             }
         }
+    }
+}
+
+tasks.publish.dependsOn({
+    def versionTest = getVersion(true)
+    println("Publishing version '${versionTest}'...")
+})
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
     }
 }
