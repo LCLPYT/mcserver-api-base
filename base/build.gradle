@@ -17,7 +17,7 @@ def getVersion(boolean strict = false) {
     } else {
         if(strict) {
             if (headTag == null) throw new IllegalStateException("Commit HEAD is not tagged.")
-            else throw new IllegalStateException("Commit HEAD tag '${tagName}' does not meet the required versioning scheme.")
+            else throw new IllegalStateException("Commit HEAD tag '${tagName}' does not meet the required versioning scheme for module 'base'.")
         } else return "dev"
     }
 }
