@@ -5,27 +5,7 @@
  */
 
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'org.ajoberstar.grgit' version '4.1.0'
-}
-
-ext {
-    SPEC_VERSION = '0.0'
-}
-
-def getVersion = {
-    // TAG-offset-hash
-    def raw = grgit.describe(longDescr: true, tags:true)
-    def desc = (raw == null ? '0.0-0-unknown' : grgit.describe(longDescr: true, tags:true)).split('-') as List
-    desc.remove(desc.size() - 1)
-    def offset = desc.remove(desc.size() - 1)
-    def tag = desc.join('-')
-    def branch = grgit.branch.current().name
-    if (branch in ['master', 'HEAD'])
-        branch = null
-    SPEC_VERSION = tag
-    return "${tag}.${offset}${t -> if (branch != null) t << '-' + branch}".toString()
 }
 
 def privateProps = new Properties()
@@ -33,58 +13,17 @@ def privatePropsFile = file("private.properties");
 if(privatePropsFile.exists())
     privatePropsFile.withInputStream { privateProps.load(it) }
 
-group 'work.lclpnet'
-archivesBaseName = 'mcserver-api'
-version getVersion()
-
-repositories {
-    mavenCentral()
-    maven { url = 'https://repo.lclpnet.work/repository/internal' }
-}
-
-dependencies {
-    implementation 'com.google.code.findbugs:jsr305:3.0.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'work.lclpnet:lclpnetwork-api:1.0.2'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-}
-
-test {
-    useJUnitPlatform()
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = 'mcserver-api'
-            from components.java
-
-            pom {
-                name = 'MCServerAPI'
-                description = 'A Java library to manage Minecraft server backend interaction with LCLPNetwork.'
-            }
-        }
+ext {
+    SPEC_VERSION = '0.0'
+    getTag = {
+        def raw = grgit.describe(longDescr: true, tags:true)
+        def desc = (raw == null ? '0.0-0-unknown' : grgit.describe(longDescr: true, tags:true)).split('-') as List
+        desc.remove(desc.size() - 1)
+        desc.remove(desc.size() - 1)
+        return tag = desc.join('-')
     }
-    repositories {
-        maven {
-            if (privateProps.containsKey('mavenPassword')
-                    && privateProps.containsKey('mavenHost')
-                    && privateProps.containsKey('mavenUser')) {
-                credentials {
-                    username privateProps.getProperty('mavenUser');
-                    password privateProps.getProperty('mavenPassword');
-                }
-                url privateProps.getProperty('mavenHost');
-            } else {
-                url "file:///${project.projectDir}/repo"
-            }
-        }
+    getHeadId = {
+        return grgit.head().abbreviatedId;
     }
+    PRIVATE = privateProps
 }

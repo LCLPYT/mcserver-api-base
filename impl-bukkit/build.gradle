@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2021 LCLP.
+ *
+ * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
+ */
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+def getVersion(boolean strict = false) {
+    def tag = "${rootProject.ext.getTag()}"
+    if (tag.matches('^bukkit-[0-9]+\\.[0-9]+\\.[0-9]+$')) return tag;
+    else {
+        if(strict) throw new IllegalStateException("Tag '${tag}' does not meet the required versioning scheme.")
+        else return "dev"
+    }
+}
+
+def privateProps = rootProject.ext.PRIVATE as Properties
+
+group 'work.lclpnet.mcserver-api'
+archivesBaseName = 'mcserver-api-bukkit'
+version getVersion()
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks.publish.dependsOn({
+    def versionTest = getVersion(true)
+    println("Publishing version '${versionTest}'...")
+})
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'mcserver-api-bukkit'
+            from components.java
+
+            pom {
+                name = 'MCServer Bukkit Implementation'
+                description = 'A Java library to manage Minecraft server backend interaction with LCLPNetwork. For Bukkit.'
+            }
+        }
+    }
+    repositories {
+        maven {
+            if (privateProps.containsKey('mavenPassword')
+                    && privateProps.containsKey('mavenHost')
+                    && privateProps.containsKey('mavenUser')) {
+                credentials {
+                    username privateProps.getProperty('mavenUser');
+                    password privateProps.getProperty('mavenPassword');
+                }
+                url privateProps.getProperty('mavenHost');
+            } else {
+                url "file:///${project.projectDir}/repo"
+            }
+        }
+    }
+}
