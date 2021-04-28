@@ -18,26 +18,19 @@ if(privatePropsFile.exists())
     privatePropsFile.withInputStream { privateProps.load(it) }
 
 ext {
-    SPEC_VERSION = '0.0'
-    getTag = {
-        def raw = grgit.describe(longDescr: true, tags:true)
-        def desc = (raw == null ? '0.0-0-unknown' : grgit.describe(longDescr: true, tags:true)).split('-') as List
-        desc.remove(desc.size() - 1)
-        desc.remove(desc.size() - 1)
-        return tag = desc.join('-')
-    }
-    getHeadId = {
+    /*getHeadId = {
         return grgit.head().abbreviatedId;
+    }*/
+    getHeadTag = {
+        def headId = grgit.head().id
+        def headTag = null
+
+        grgit.tag.list().forEach {
+            def tag = it as Tag
+            if(tag.commit.id == headId) headTag = tag;
+        }
+
+        return headTag
     }
     PRIVATE = privateProps
 }
-
-def headId = grgit.head().id
-def headTag = null
-
-grgit.tag.list().forEach {
-    def tag = it as Tag
-    if(tag.commit.id == headId) headTag = tag;
-}
-
-println headTag
