@@ -13,17 +13,17 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IPlatformBridge {
 
-    void sendMessageTo(MCPlayer player, MCMessage msg);
+    void sendMessageTo(String playerUuid, MCMessage msg);
 
     /**
-     * Gets the current name of a {@link MCPlayer}.
+     * Gets the current name of the Minecraft account with the given UUID.
      * The server implementation should check for any online players with the {@link MCPlayer}'s UUID first, in order to save time.
      * If there is no player with that UUID online, it needs to be fetched from the Mojang API.
      *
-     * @param player The player to get the name from.
+     * @param playerUuid The player UUID to get the name from.
      * @return A completable future that will receive the fetched player name.
      */
-    CompletableFuture<String> getPlayerName(MCPlayer player);
+    CompletableFuture<String> getPlayerNameByUUID(String playerUuid);
 
     /**
      * Fetches the UUID of a minecraft username.

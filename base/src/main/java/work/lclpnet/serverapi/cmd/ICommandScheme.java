@@ -6,7 +6,6 @@
 
 package work.lclpnet.serverapi.cmd;
 
-import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverapi.util.IPlatformBridge;
 
@@ -14,7 +13,7 @@ public interface ICommandScheme {
 
     String getName();
 
-    void execute(MCPlayer player, Object[] args);
+    void execute(String playerUuid, Object[] args);
 
     public interface IPlatformCommandScheme extends ICommandScheme {
 

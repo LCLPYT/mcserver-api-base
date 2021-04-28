@@ -6,7 +6,6 @@
 
 package work.lclpnet.serverapi.cmd;
 
-import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.lclpnetwork.facade.MCStats;
 import work.lclpnet.serverapi.util.IPlatformBridge;
 import work.lclpnet.serverapi.util.ImplementationException;
@@ -14,7 +13,7 @@ import work.lclpnet.serverapi.util.MCMessage;
 
 public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandScheme {
 
-    void openStats(MCPlayer player, MCPlayer target, MCMessage targetName, MCStats targetStats);
+    void openStats(String invokerUuid, String targetUuid, MCMessage targetName, MCStats targetStats);
 
     @Override
     default String getName() {
@@ -22,19 +21,13 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
     }
 
     @Override
-    default void execute(MCPlayer player, Object[] args) {
+    default void execute(String playerUuid, Object[] args) {
         IPlatformBridge bridge = getPlatformBridge();
 
         if(args.length > 1) throw new ImplementationException();
 
         if(args.length <= 0) { // fetch the sender's stats
-            fetchStats(player, player);
-            return;
-        }
-
-        // fetch someone else's stats
-        if (args[0] instanceof MCPlayer) {
-            fetchStats(player, (MCPlayer) args[0]);
+            fetchStats(playerUuid, playerUuid);
             return;
         }
 
@@ -48,51 +41,51 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
             // First, fetch player by UUID.
             getAPI().getMCPlayerByUUID(argument).thenAccept(fetchedTarget -> {
                 if(fetchedTarget == null) { // there was an error or no player was found
-                    bridge.sendMessageTo(player, MCMessage.error()
+                    bridge.sendMessageTo(playerUuid, MCMessage.error()
                             .thenTranslate("lclp.player.not_found_uuid", MCMessage.blank()
                                     .setColor(MCMessage.MessageColor.YELLOW)
                                     .text(argument)));
                 } else { // target fetched successfully.
-                    fetchStats(player, fetchedTarget);
+                    fetchStats(playerUuid, fetchedTarget.getUuid());
                 }
             });
         } else { // otherwise assume the argument is a username.
-            bridge.getPlayerByName(argument,getAPI()).thenAccept(fetchedTarget -> {
+            bridge.getPlayerByName(argument, getAPI()).thenAccept(fetchedTarget -> {
                 if(fetchedTarget == null) { // there was an error or no player was found
-                    bridge.sendMessageTo(player, MCMessage.error()
+                    bridge.sendMessageTo(playerUuid, MCMessage.error()
                             .thenTranslate("lclp.player.not_found_name", MCMessage.blank()
                                     .setColor(MCMessage.MessageColor.YELLOW)
                                     .text(argument)));
                 } else { // target fetched successfully.
-                    fetchStats(player, fetchedTarget);
+                    fetchStats(playerUuid, fetchedTarget.getUuid());
                 }
             });
         }
     }
 
-    default void fetchStats(MCPlayer invoker, MCPlayer target) {
+    default void fetchStats(String invokerUuid, String targetUuid) {
         IPlatformBridge bridge = getPlatformBridge();
 
-        if(!(invoker.equals(target))) {
-            bridge.getPlayerName(target).thenAccept(name -> {
+        if(!invokerUuid.equals(targetUuid)) {
+            bridge.getPlayerNameByUUID(targetUuid).thenAccept(name -> {
                 MCMessage nameMsg = MCMessage.blank().text(name);
-                bridge.sendMessageTo(invoker, MCMessage.prefixed().thenTranslate("stats.loading", nameMsg));
-                fetchActual(invoker, target, nameMsg);
+                bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.loading", nameMsg));
+                fetchActual(invokerUuid, targetUuid, nameMsg);
             });
             return;
         }
 
-        bridge.sendMessageTo(invoker, MCMessage.prefixed().thenTranslate("stats.loading_yours"));
-        fetchActual(invoker, target, MCMessage.blank().thenTranslate("stats.yours"));
+        bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.loading_yours"));
+        fetchActual(invokerUuid, targetUuid, MCMessage.blank().thenTranslate("stats.yours"));
     }
 
-    default void fetchActual(MCPlayer invoker, MCPlayer target, MCMessage targetName) {
+    default void fetchActual(String invokerUuid, String targetUuid, MCMessage targetName) {
         IPlatformBridge bridge = getPlatformBridge();
-        getAPI().getStats(target.getUuid(), null).thenAccept(stats -> {
+        getAPI().getStats(targetUuid, null).thenAccept(stats -> {
             if(stats == null) {
-                bridge.sendMessageTo(invoker, MCMessage.prefixed().thenTranslate("stats.error"));
+                bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.error"));
             } else {
-                openStats(invoker, target, targetName, stats);
+                openStats(invokerUuid, targetUuid, targetName, stats);
             }
         });
     }
