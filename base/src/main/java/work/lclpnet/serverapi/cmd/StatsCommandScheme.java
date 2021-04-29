@@ -11,6 +11,8 @@ import work.lclpnet.serverapi.util.IPlatformBridge;
 import work.lclpnet.serverapi.util.ImplementationException;
 import work.lclpnet.serverapi.util.MCMessage;
 
+import java.util.concurrent.CompletionException;
+
 public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandScheme {
 
     void openStats(String invokerUuid, String targetUuid, MCMessage title, MCStats targetStats);
@@ -60,12 +62,15 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
                     fetchStats(playerUuid, fetchedTarget.getUuid());
                 }
             }).exceptionally(throwable -> {
-                if(throwable instanceof NullPointerException
-                        && "There is no minecraft account with that UUID".equals(throwable.getMessage())) {
-                    bridge.sendMessageTo(playerUuid, MCMessage.error()
-                            .thenTranslate("mc.player.not_found_name", MCMessage.blank()
-                                    .setColor(MCMessage.MessageColor.YELLOW)
-                                    .text(argument)));
+                if(throwable instanceof CompletionException) {
+                    Throwable cause = throwable.getCause();
+                    if(cause instanceof NullPointerException
+                            && "There is no minecraft account with that name.".equals(cause.getMessage())) {
+                        bridge.sendMessageTo(playerUuid, MCMessage.error()
+                                .thenTranslate("mc.player.not_found_name", MCMessage.blank()
+                                        .setColor(MCMessage.MessageColor.YELLOW)
+                                        .text(argument)));
+                    }
                 }
                 return null;
             });

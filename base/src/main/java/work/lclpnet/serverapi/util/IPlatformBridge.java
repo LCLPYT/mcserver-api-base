@@ -44,7 +44,7 @@ public interface IPlatformBridge {
      */
     default CompletableFuture<MCPlayer> getPlayerByName(String name, MCServerAPI api) {
         return getPlayerUUIDByName(name).thenCompose(uuid -> {
-            if (uuid == null) throw new NullPointerException("There is no minecraft account with that UUID.");
+            if (uuid == null) throw new NullPointerException("There is no minecraft account with that name.");
             else return api.getMCPlayerByUUID(uuid);
         });
     }
