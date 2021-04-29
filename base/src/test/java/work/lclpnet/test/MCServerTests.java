@@ -72,8 +72,10 @@ public class MCServerTests {
     void requestMCLinkReverseToken() throws IOException {
         MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
         assertNotNull(instance);
-        String token = instance.requestMCLinkReverseToken("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
-        assertNotNull(token);
+        MCLinkResponse linkResponse = instance.requestMCLinkReverseToken("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
+        assertNotNull(linkResponse);
+        assertFalse(linkResponse.isAlreadyLinked());
+        assertNotNull(linkResponse.getToken());
     }*/
 
     /* */

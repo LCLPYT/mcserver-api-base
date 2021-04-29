@@ -9,11 +9,13 @@ package work.lclpnet.serverapi;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import work.lclpnet.lclpnetwork.api.APIAccess;
+import work.lclpnet.lclpnetwork.api.APIError;
 import work.lclpnet.lclpnetwork.api.annotation.AuthRequired;
 import work.lclpnet.lclpnetwork.api.annotation.Scopes;
 import work.lclpnet.lclpnetwork.ext.LCLPMinecraftAPI;
 import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.lclpnetwork.util.JsonBuilder;
+import work.lclpnet.serverapi.api.MCLinkResponse;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -95,17 +97,22 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .thenApply(resp -> resp.getResponseCode() == 201);
     }
 
-    public CompletableFuture<String> requestMCLinkReverseToken(String uuid) {
+    public CompletableFuture<MCLinkResponse> requestMCLinkReverseToken(String uuid) {
         return api.post("api/mc/admin/request-mclink-reverse-token", JsonBuilder.object()
                 .set("uuid", uuid)
                 .createObject()).thenApply(resp -> {
+            if(resp.getResponseCode() == 422 && resp.hasValidationViolations()) {
+                APIError error = resp.getValidationViolations();
+                if(error.has("uuid", "The uuid has already been taken."))
+                    return new MCLinkResponse(true, null);
+            }
             if(resp.getResponseCode() != 201) return null;
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("token");
             if (elem == null) return null;
 
-            return elem.getAsString();
+            return new MCLinkResponse(false, elem.getAsString());
         });
     }
 
