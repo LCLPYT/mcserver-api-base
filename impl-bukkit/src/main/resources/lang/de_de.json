@@ -1,4 +1,6 @@
 {
   "mc-link.requesting": "Ein MCLink wird für dich erstellt...",
-  "mc-link.open": "Öffne diesen Link, um deine Konten zu verbinden: %s"
+  "mc-link.open": "Öffne diesen Link, um deine Konten zu verbinden: %s",
+  "mc-link.error": "Ein unerwarteter Fehler ist aufgetreten.",
+  "mc-link.already-linked": "Du hast dein Minecraft-Konto schon mit einem LCLPNetwork-Konto verbunden!"
 }
