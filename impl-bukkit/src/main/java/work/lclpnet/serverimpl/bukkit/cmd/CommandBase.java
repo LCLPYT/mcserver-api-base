@@ -15,11 +15,7 @@ import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
 
 public abstract class CommandBase implements CommandExecutor {
 
-    protected final String name;
-
-    public CommandBase(String name) {
-        this.name = name;
-    }
+    public abstract String getCommandName();
 
     public abstract boolean canExecute(CommandSender sender);
 
@@ -44,7 +40,7 @@ public abstract class CommandBase implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(command.getName().equalsIgnoreCase(name)) {
+        if(command.getName().equalsIgnoreCase(getCommandName())) {
             if(canExecute(sender)) execute(sender, args);
             return true;
         }

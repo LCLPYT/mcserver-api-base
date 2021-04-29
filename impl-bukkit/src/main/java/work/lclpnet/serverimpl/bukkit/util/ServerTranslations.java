@@ -6,6 +6,7 @@
 
 package work.lclpnet.serverimpl.bukkit.util;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import work.lclpnet.serverapi.util.ServerTranslation;
 
@@ -25,6 +26,10 @@ public class ServerTranslations {
                 "en_us");
 
         serverTranslation.load();
+    }
+
+    public static String getTranslation(Player p, String key, Object... substitutes) {
+        return getTranslation(p.getLocale(), key, substitutes);
     }
 
     public static String getTranslation(String locale, String key, Object... substitutes) {

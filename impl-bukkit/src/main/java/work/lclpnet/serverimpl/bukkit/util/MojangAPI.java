@@ -33,7 +33,16 @@ public class MojangAPI {
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("id");
-            return elem == null ? null : elem.getAsString();
+            if(elem == null) return null;
+            else {
+                String id = elem.getAsString();
+                StringBuilder builder = new StringBuilder(id.trim());
+                builder.insert(20, "-");
+                builder.insert(16, "-");
+                builder.insert(12, "-");
+                builder.insert(8, "-");
+                return builder.toString();
+            }
         });
     }
 

@@ -13,7 +13,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class BukkitCommands {
 
     public static void register(JavaPlugin plugin) {
-        registerCommand(plugin, "mclink", new CommandMCLink("mclink"));
+        registerCommand(plugin, "mclink", new CommandMCLink());
+        registerCommand(plugin, "stats", new CommandStats());
     }
 
     private static void registerCommand(JavaPlugin plugin, String name, CommandExecutor executor) {

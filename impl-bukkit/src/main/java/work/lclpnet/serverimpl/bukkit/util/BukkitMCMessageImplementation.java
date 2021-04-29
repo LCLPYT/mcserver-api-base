@@ -36,6 +36,10 @@ public class BukkitMCMessageImplementation {
         }
 
         if(msg.isTextNode()) {
+            StringBuilder formatBuilder = new StringBuilder();
+            getChatColorsFromStyle(localStyle).forEach(formatBuilder::append);
+            String format = formatBuilder.toString();
+
             String text;
             if(msg instanceof MCMessage.MCTranslationMessage) {
                 MCMessage.MCTranslationMessage translationMsg = (MCMessage.MCTranslationMessage) msg;
@@ -44,7 +48,7 @@ public class BukkitMCMessageImplementation {
                 String[] substitutes = new String[substituteList.size()];
                 for (int i = 0; i < substituteList.size(); i++) {
                     MCMessage subMsg = substituteList.get(i);
-                    substitutes[i] = convertMCMessageToString(subMsg, receiver);
+                    substitutes[i] = convertMCMessageToString(subMsg, receiver).concat(format);
                 }
 
                 text = ServerTranslations.getTranslation(receiver.getLocale(), translationMsg.getText(), (Object[]) substitutes);
@@ -52,10 +56,7 @@ public class BukkitMCMessageImplementation {
                 text = msg.getText();
             }
 
-            List<ChatColor> formatList = getChatColorsFromStyle(localStyle);
-            formatList.forEach(builder::append);
-
-            builder.append(text);
+            builder.append(format).append(text);
         } else {
             msg.getChildren().forEach(child -> recurseMessage(child, localStyle, receiver, builder));
         }

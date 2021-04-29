@@ -64,7 +64,7 @@ repositories {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
     implementation 'work.lclpnet:lclpnetwork-api:1.0.3'
-    implementation 'work.lclpnet.mcserver-api:mcserver-api-base:0.4.3'
+    implementation 'work.lclpnet.mcserver-api:mcserver-api-base:0.4.6'
     implementation 'work.lclpnet:lclpstorage:1.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
