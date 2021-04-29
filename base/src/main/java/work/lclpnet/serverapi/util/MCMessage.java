@@ -230,7 +230,7 @@ public class MCMessage {
      * @return A new prefixed message.
      */
     public static MCMessage prefixed(MessageColor prefixColor) {
-        return blank().then(blank().setColor(prefixColor).text(prefix)).setColor(MessageColor.GRAY);
+        return blank().then(blank().setColor(prefixColor).text(prefix + "> ")).setColor(MessageColor.GRAY);
     }
 
     /**
