@@ -28,7 +28,7 @@ public interface MCLinkCommandScheme extends ICommandScheme.IPlatformCommandSche
                 bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
                         .thenTranslate("mc-link.error"));
             } else {
-                String link = String.format("https://lclpnet.work/me/mc-link/%s", token);
+                String link = String.format("%s/me/mc-link/%s", getAPI().getAPIAccess().getHost(), token);
                 bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
                         .setColor(MCMessage.MessageColor.GREEN)
                         .thenTranslate("mc-link.open", MCMessage.blank()
