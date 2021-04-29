@@ -23,12 +23,15 @@ public interface MCLinkCommandScheme extends ICommandScheme.IPlatformCommandSche
         bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
                 .thenTranslate("mc-link.requesting"));
 
-        getAPI().requestMCLinkReverseToken(playerUuid).thenAccept(token -> {
-            if(token == null) {
-                bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
+        getAPI().requestMCLinkReverseToken(playerUuid).thenAccept(linkResponse -> {
+            if(linkResponse == null) {
+                bridge.sendMessageTo(playerUuid, MCMessage.error()
                         .thenTranslate("mc-link.error"));
+            } else if(linkResponse.isAlreadyLinked()) {
+                bridge.sendMessageTo(playerUuid, MCMessage.error()
+                        .thenTranslate("mc-link.already-linked"));
             } else {
-                String link = String.format("%s/me/mc-link/%s", getAPI().getAPIAccess().getHost(), token);
+                String link = String.format("%s/me/mc-link/%s", getAPI().getAPIAccess().getHost(), linkResponse.getToken());
                 bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
                         .setColor(MCMessage.MessageColor.GREEN)
                         .thenTranslate("mc-link.open", MCMessage.blank()
