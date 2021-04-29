@@ -14,7 +14,9 @@ import work.lclpnet.lclpnetwork.api.APIAccess;
 import work.lclpnet.lclpnetwork.api.APIAuthAccess;
 import work.lclpnet.lclpnetwork.util.Utils;
 import work.lclpnet.serverapi.MCServerAPI;
+import work.lclpnet.serverimpl.bukkit.cmd.BukkitCommands;
 import work.lclpnet.serverimpl.bukkit.event.EventListener;
+import work.lclpnet.serverimpl.bukkit.util.ServerTranslations;
 import work.lclpnet.storage.LocalLCLPStorage;
 
 import java.io.*;
@@ -43,6 +45,12 @@ public class MCServerBukkit extends JavaPlugin {
     @Override
     public void onLoad() {
         loadConfig();
+
+        try {
+            ServerTranslations.init(this);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not initialize translation service", e);
+        }
 
         String token;
         try {
@@ -74,6 +82,7 @@ public class MCServerBukkit extends JavaPlugin {
         MCServerBukkit.plugin = this;
 
         registerListeners();
+        BukkitCommands.register(this);
 
         Bukkit.getConsoleSender().sendMessage(String.format("%s%sPlugin enabled.", pre, ChatColor.GREEN));
     }

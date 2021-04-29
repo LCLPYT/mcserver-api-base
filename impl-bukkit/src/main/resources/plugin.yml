@@ -5,3 +5,9 @@ api-version: 1.14
 authors: [ LCLP ]
 description: LCLPNetwork integration for Minecraft Bukkit servers.
 website: https://lclpnet.work
+
+commands:
+  mclink:
+    description: Link your Minecraft account with your LCLPNetwork account.
+  stats:
+    description: View a player's stats.
