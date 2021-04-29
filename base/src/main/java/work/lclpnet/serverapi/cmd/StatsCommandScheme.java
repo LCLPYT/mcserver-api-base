@@ -59,6 +59,15 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
                 } else { // target fetched successfully.
                     fetchStats(playerUuid, fetchedTarget.getUuid());
                 }
+            }).exceptionally(throwable -> {
+                if(throwable instanceof NullPointerException
+                        && "There is no minecraft account with that UUID".equals(throwable.getMessage())) {
+                    bridge.sendMessageTo(playerUuid, MCMessage.error()
+                            .thenTranslate("mc.player.not_found_name", MCMessage.blank()
+                                    .setColor(MCMessage.MessageColor.YELLOW)
+                                    .text(argument)));
+                }
+                return null;
             });
         }
     }
