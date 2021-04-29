@@ -13,7 +13,7 @@ import work.lclpnet.serverapi.util.MCMessage;
 
 public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandScheme {
 
-    void openStats(String invokerUuid, String targetUuid, MCMessage targetName, MCStats targetStats);
+    void openStats(String invokerUuid, String targetUuid, MCMessage title, MCStats targetStats);
 
     @Override
     default String getName() {
@@ -70,22 +70,22 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
             bridge.getPlayerNameByUUID(targetUuid).thenAccept(name -> {
                 MCMessage nameMsg = MCMessage.blank().text(name);
                 bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.loading", nameMsg));
-                fetchActual(invokerUuid, targetUuid, nameMsg);
+                fetchActual(invokerUuid, targetUuid, MCMessage.blank().thenTranslate("stats.title.player", nameMsg));
             });
             return;
         }
 
         bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.loading_yours"));
-        fetchActual(invokerUuid, targetUuid, MCMessage.blank().thenTranslate("stats.yours"));
+        fetchActual(invokerUuid, targetUuid, MCMessage.blank().thenTranslate("stats.title.yours"));
     }
 
-    default void fetchActual(String invokerUuid, String targetUuid, MCMessage targetName) {
+    default void fetchActual(String invokerUuid, String targetUuid, MCMessage title) {
         IPlatformBridge bridge = getPlatformBridge();
         getAPI().getStats(targetUuid, null).thenAccept(stats -> {
             if(stats == null) {
                 bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.error"));
             } else {
-                openStats(invokerUuid, targetUuid, targetName, stats);
+                openStats(invokerUuid, targetUuid, title, stats);
             }
         });
     }
