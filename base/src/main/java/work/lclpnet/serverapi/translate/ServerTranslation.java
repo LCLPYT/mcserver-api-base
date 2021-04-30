@@ -86,7 +86,7 @@ public class ServerTranslation {
     }
 
     @Nonnull
-    public SimpleDateFormat getDateFormat(String locale) {
+    public static SimpleDateFormat getDateFormat(String locale) {
         if(dateFormats.containsKey(locale)) return dateFormats.get(locale);
 
         if(!hasTranslation(locale, "date.format")) {
