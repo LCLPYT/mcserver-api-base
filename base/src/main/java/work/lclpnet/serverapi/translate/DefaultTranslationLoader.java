@@ -46,11 +46,7 @@ public class DefaultTranslationLoader implements ITranslationLoader {
 
         List<String> translationFiles = translationLocator.locate();
 
-        if(translationFiles.isEmpty()) {
-            logger.error("Could not locate any translation files. Translation will fail.");
-            return null;
-        }
-
+        logger.info(String.format("Located %s translation files.", translationFiles.size()));
         logger.info("Loading translations...");
 
         Map<String, Map<String, String>> languages = new HashMap<>();
@@ -91,7 +87,11 @@ public class DefaultTranslationLoader implements ITranslationLoader {
             languages.put(language, translations);
         }
 
-        logger.info("Translations loaded.");
+        int entries = 0;
+        for(Map<String, String> langTranslations : languages.values())
+            entries += langTranslations.size();
+
+        logger.info(String.format("Loaded %s locales with a total of %s translation entries.", languages.size(), entries));
         return languages;
     }
 

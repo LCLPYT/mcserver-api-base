@@ -26,6 +26,10 @@ public class ServerTranslation {
         return defaultLanguage;
     }
 
+    public static Map<String, Map<String, String>> getLocaleTranslations() {
+        return languages;
+    }
+
     /**
      * Loads translation files from a given loader and adds all translations to the {@link ServerTranslation} translation list.
      * If there are duplicate keys, the one which was loaded last will be used.
