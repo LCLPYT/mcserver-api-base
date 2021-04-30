@@ -6,6 +6,8 @@
 
 package work.lclpnet.serverapi.translate;
 
+import work.lclpnet.serverapi.util.ILogger;
+
 import java.io.IOException;
 import java.net.URL;
 import java.security.CodeSource;
@@ -18,11 +20,13 @@ import java.util.zip.ZipInputStream;
 
 public class DefaultTranslationLocator implements ITranslationLocator {
 
-    private final DefaultTranslationLoader loader;
+    private final Class<?> owningClass;
+    private final ILogger logger;
     private Predicate<String> fileNamePredicate;
 
-    public DefaultTranslationLocator(DefaultTranslationLoader loader, List<String> resourceDirectories) {
-        this.loader = loader;
+    public DefaultTranslationLocator(Class<?> owningClass, ILogger logger, List<String> resourceDirectories) {
+        this.owningClass = owningClass;
+        this.logger = logger;
         this.fileNamePredicate = name -> name.endsWith(".json") && resourceDirectories.stream().anyMatch(name::startsWith);
     }
 
@@ -32,7 +36,7 @@ public class DefaultTranslationLocator implements ITranslationLocator {
 
     @Override
     public List<String> locate() throws IOException {
-        CodeSource src = loader.owningClass.getProtectionDomain().getCodeSource();
+        CodeSource src = owningClass.getProtectionDomain().getCodeSource();
         if(src == null) throw new NullPointerException("code source is null");
 
         List<String> translationFiles = new ArrayList<>();
@@ -47,7 +51,7 @@ public class DefaultTranslationLocator implements ITranslationLocator {
                 if(!fileNamePredicate.test(name)) continue;
 
                 translationFiles.add(name);
-                loader.logger.info(String.format("Located translation file '%s'.", name));
+                logger.info(String.format("Located translation file '%s'.", name));
             }
         }
 
