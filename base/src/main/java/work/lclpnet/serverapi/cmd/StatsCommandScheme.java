@@ -7,9 +7,9 @@
 package work.lclpnet.serverapi.cmd;
 
 import work.lclpnet.lclpnetwork.facade.MCStats;
+import work.lclpnet.serverapi.translate.MCMessage;
 import work.lclpnet.serverapi.util.IPlatformBridge;
 import work.lclpnet.serverapi.util.ImplementationException;
-import work.lclpnet.serverapi.util.MCMessage;
 
 import java.util.concurrent.CompletionException;
 

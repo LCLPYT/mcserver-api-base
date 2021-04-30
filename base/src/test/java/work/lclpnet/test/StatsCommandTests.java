@@ -11,10 +11,10 @@ import work.lclpnet.lclpnetwork.api.APIAccess;
 import work.lclpnet.lclpnetwork.facade.MCStats;
 import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverapi.cmd.StatsCommandScheme;
+import work.lclpnet.serverapi.translate.MCMessage;
+import work.lclpnet.serverapi.translate.RawMCMessageImplementation;
 import work.lclpnet.serverapi.util.IPlatformBridge;
-import work.lclpnet.serverapi.util.MCMessage;
 import work.lclpnet.serverapi.util.MojangAPI;
-import work.lclpnet.serverapi.util.RawMCMessageImplementation;
 
 import java.util.concurrent.CompletableFuture;
 

@@ -1,0 +1,16 @@
+{
+  "mc-link.requesting": "Creating a MCLink for you...",
+  "mc-link.open": "Open this link to link your accounts: %s",
+  "mc-link.error": "An unexpected error occurred.",
+  "mc-link.already-linked": "You have already linked your Minecraft account with a LCLPNetwork account!",
+  "stats.usage": "Usage: /%s [player]",
+  "mc.player.not_found_name": "There is no Minecraft account with the name '%s'.",
+  "lclp.player.not_found_uuid": "No player with the UUID '%s' has ever played on LCLPNetwork.",
+  "lclp.player.not_found_name": "'%s' has never played on LCLPNetwork.",
+  "stats.loading": "Loading %s's stats...",
+  "stats.loading_yours": "Loading your stats...",
+  "stats.title.player": "%s's stats",
+  "stats.title.yours": "Your stats",
+  "stats.error": "An unexpected error occurred.",
+  "date.format": "MM/dd/yyyy hh:mm a"
+}

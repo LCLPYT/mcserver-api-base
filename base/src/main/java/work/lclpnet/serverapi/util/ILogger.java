@@ -8,7 +8,7 @@ package work.lclpnet.serverapi.util;
 
 public interface ILogger {
 
-    ILogger DUMMY = new ILogger() {
+    ILogger SILENT = new ILogger() {
         @Override
         public void info(String msg) {
 

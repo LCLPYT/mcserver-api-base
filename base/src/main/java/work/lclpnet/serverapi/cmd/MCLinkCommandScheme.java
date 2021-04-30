@@ -6,8 +6,8 @@
 
 package work.lclpnet.serverapi.cmd;
 
+import work.lclpnet.serverapi.translate.MCMessage;
 import work.lclpnet.serverapi.util.IPlatformBridge;
-import work.lclpnet.serverapi.util.MCMessage;
 
 public interface MCLinkCommandScheme extends ICommandScheme.IPlatformCommandScheme {
 

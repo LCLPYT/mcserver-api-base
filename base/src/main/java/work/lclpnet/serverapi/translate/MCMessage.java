@@ -4,7 +4,9 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.serverapi.util;
+package work.lclpnet.serverapi.translate;
+
+import work.lclpnet.serverapi.util.IPlatformBridge;
 
 import java.util.ArrayList;
 import java.util.Arrays;

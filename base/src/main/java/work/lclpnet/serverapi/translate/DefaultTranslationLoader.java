@@ -4,68 +4,56 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.serverapi.util;
+package work.lclpnet.serverapi.translate;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import work.lclpnet.serverapi.util.ILogger;
 
 import javax.annotation.Nullable;
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.CodeSource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-public class ServerTranslation {
+public class DefaultTranslationLoader implements ITranslationLoader {
 
-    private final Function<String, InputStream> resourceLoader;
-    private final Class<?> owningClass;
-    private final ILogger logger;
-    private final String defaultLanguage;
-    private final Map<String, Map<String, String>> languages = new HashMap<>();
+    private ITranslationLocator translationLocator;
+    public final Function<String, InputStream> resourceLoader;
+    public final Class<?> owningClass;
+    public final ILogger logger;
 
-    public ServerTranslation(Function<String, InputStream> resourceLoader, Class<?> owningClass, @Nullable ILogger logger, String defaultLanguage) {
+    public DefaultTranslationLoader(Function<String, InputStream> resourceLoader, Class<?> owningClass, @Nullable ILogger logger) {
         this.resourceLoader = Objects.requireNonNull(resourceLoader);
         this.owningClass = Objects.requireNonNull(owningClass);
-        this.logger = logger == null ? ILogger.DUMMY : logger;
-        this.defaultLanguage = Objects.requireNonNull(defaultLanguage);
+        this.logger = logger == null ? ILogger.SILENT : logger;
+        this.translationLocator = new DefaultTranslationLocator(this);
     }
 
-    public void load() throws IOException {
-        languages.clear();
+    public void setTranslationLocator(ITranslationLocator translationLocator) {
+        this.translationLocator = translationLocator;
+    }
 
+    @Nullable
+    @Override
+    public Map<String, Map<String, String>> load() throws IOException {
         logger.info("Locating translation files...");
 
-        CodeSource src = owningClass.getProtectionDomain().getCodeSource();
-        if(src == null) throw new NullPointerException("code source is null");
-
-        List<String> translationFiles = new ArrayList<>();
-
-        URL jar = src.getLocation();
-        try (ZipInputStream zip = new ZipInputStream(jar.openStream())) {
-            while(true) {
-                ZipEntry entry = zip.getNextEntry();
-                if(entry == null) break;
-
-                String name = entry.getName();
-                if(!name.startsWith("lang/") || !name.endsWith(".json")) continue;
-
-                translationFiles.add(name);
-                logger.info(String.format("Located translation file '%s'.", name));
-            }
-        }
+        List<String> translationFiles = translationLocator.locate();
 
         if(translationFiles.isEmpty()) {
             logger.error("Could not locate any translation files. Translation will fail.");
-            return;
+            return null;
         }
 
         logger.info("Loading translations...");
+
+        Map<String, Map<String, String>> languages = new HashMap<>();
 
         final Gson gson = new Gson();
         for (String file : translationFiles) {
@@ -103,33 +91,8 @@ public class ServerTranslation {
             languages.put(language, translations);
         }
 
-        if(!languages.containsKey(defaultLanguage))
-            logger.warn(String.format("Default language '%s' was not loaded.", defaultLanguage));
-
         logger.info("Translations loaded.");
-    }
-
-    public String getTranslation(String locale, String key, Object... substitutes) {
-        Map<String, String> translations = languages.get(locale);
-        if(translations == null) {
-            translations = getDefaultLanguage();
-            if(translations == null) return key;
-        }
-
-        String translation = translations.get(key);
-        if(translation == null) {
-            translations = getDefaultLanguage();
-            if(translations == null) return key;
-
-            translation = translations.get(key);
-            if(translation == null) return key;
-        }
-
-        return String.format(translation, substitutes);
-    }
-
-    private Map<String, String> getDefaultLanguage() {
-        return languages.get(defaultLanguage);
+        return languages;
     }
 
 }
