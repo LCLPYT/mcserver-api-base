@@ -17,7 +17,6 @@ public class StatsManager {
 
     public static void markAsStats(Inventory inv) {
         statsInventories.add(inv);
-        System.out.println(statsInventories);
     }
 
     public static void removeStatsMarker(Inventory inv) {

@@ -8,11 +8,12 @@ package work.lclpnet.serverimpl.bukkit.util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import work.lclpnet.serverapi.util.MCMessage;
+import work.lclpnet.serverapi.translate.MCMessage;
+import work.lclpnet.serverapi.translate.ServerTranslation;
 
 import java.util.*;
 
-import static work.lclpnet.serverapi.util.MCMessage.MessageColor.*;
+import static work.lclpnet.serverapi.translate.MCMessage.MessageColor.*;
 
 public class BukkitMCMessageImplementation {
 
@@ -51,7 +52,7 @@ public class BukkitMCMessageImplementation {
                     substitutes[i] = convertMCMessageToString(subMsg, receiver).concat(format);
                 }
 
-                text = ServerTranslations.getTranslation(receiver.getLocale(), translationMsg.getText(), (Object[]) substitutes);
+                text = ServerTranslation.getTranslation(receiver.getLocale(), translationMsg.getText(), (Object[]) substitutes);
             } else {
                 text = msg.getText();
             }

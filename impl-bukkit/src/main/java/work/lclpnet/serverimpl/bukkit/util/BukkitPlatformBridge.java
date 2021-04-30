@@ -8,8 +8,9 @@ package work.lclpnet.serverimpl.bukkit.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import work.lclpnet.serverapi.translate.MCMessage;
 import work.lclpnet.serverapi.util.IPlatformBridge;
-import work.lclpnet.serverapi.util.MCMessage;
+import work.lclpnet.serverapi.util.MojangAPI;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

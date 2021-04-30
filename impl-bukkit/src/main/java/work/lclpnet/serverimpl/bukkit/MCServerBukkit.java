@@ -16,7 +16,7 @@ import work.lclpnet.lclpnetwork.util.Utils;
 import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverimpl.bukkit.cmd.BukkitCommands;
 import work.lclpnet.serverimpl.bukkit.event.EventListener;
-import work.lclpnet.serverimpl.bukkit.util.ServerTranslations;
+import work.lclpnet.serverimpl.bukkit.util.BukkitServerTranslation;
 import work.lclpnet.storage.LocalLCLPStorage;
 
 import java.io.*;
@@ -47,7 +47,7 @@ public class MCServerBukkit extends JavaPlugin {
         loadConfig();
 
         try {
-            ServerTranslations.init(this);
+            BukkitServerTranslation.init(this);
         } catch (IOException e) {
             throw new IllegalStateException("Could not initialize translation service", e);
         }
