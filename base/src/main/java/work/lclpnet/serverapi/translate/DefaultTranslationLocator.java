@@ -19,7 +19,7 @@ import java.util.zip.ZipInputStream;
 public class DefaultTranslationLocator implements ITranslationLocator {
 
     private final DefaultTranslationLoader loader;
-    private Predicate<String> fileNamePredicate = name -> name.startsWith("lang/") && name.endsWith(".json");
+    private Predicate<String> fileNamePredicate = name -> name.startsWith("resource/mcsapi/lang/") && name.endsWith(".json");
 
     public DefaultTranslationLocator(DefaultTranslationLoader loader) {
         this.loader = loader;
