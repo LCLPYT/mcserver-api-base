@@ -28,11 +28,11 @@ public class DefaultTranslationLoader implements ITranslationLoader {
     public final Class<?> owningClass;
     public final ILogger logger;
 
-    public DefaultTranslationLoader(Function<String, InputStream> resourceLoader, Class<?> owningClass, @Nullable ILogger logger) {
+    public DefaultTranslationLoader(ITranslationLocator translationLocator, Function<String, InputStream> resourceLoader, Class<?> owningClass, @Nullable ILogger logger) {
+        this.translationLocator = Objects.requireNonNull(translationLocator);
         this.resourceLoader = Objects.requireNonNull(resourceLoader);
         this.owningClass = Objects.requireNonNull(owningClass);
         this.logger = logger == null ? ILogger.SILENT : logger;
-        this.translationLocator = new DefaultTranslationLocator(this);
     }
 
     public void setTranslationLocator(ITranslationLocator translationLocator) {
