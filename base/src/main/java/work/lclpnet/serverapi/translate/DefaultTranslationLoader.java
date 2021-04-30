@@ -84,7 +84,9 @@ public class DefaultTranslationLoader implements ITranslationLoader {
                 }
             }
 
-            languages.put(language, translations);
+            Map<String, String> alreadyPut = languages.get(language);
+            if(alreadyPut == null) languages.put(language, translations);
+            else alreadyPut.putAll(translations);
         }
 
         int entries = 0;
