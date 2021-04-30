@@ -5,6 +5,7 @@
   "mc-link.already-linked": "You have already linked your Minecraft account with a LCLPNetwork account!",
   "stats.usage": "Usage: /%s [player]",
   "mc.player.not_found_name": "There is no Minecraft account with the name '%s'.",
+  "mc.search_player": "Searching player '%s'...",
   "lclp.player.not_found_uuid": "No player with the UUID '%s' has ever played on LCLPNetwork.",
   "lclp.player.not_found_name": "'%s' has never played on LCLPNetwork.",
   "stats.loading": "Loading %s's stats...",

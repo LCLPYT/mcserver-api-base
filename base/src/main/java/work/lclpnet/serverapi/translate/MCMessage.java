@@ -221,6 +221,13 @@ public class MCMessage {
     }
 
     /**
+     * @return A new blank message which inherits it's parent's style.
+     */
+    public static MCMessage inherit() {
+        return new MCMessage(MessageColor.WHITE, ColorMode.INHERIT);
+    }
+
+    /**
      * @return A new prefixed message.
      */
     public static MCMessage prefixed() {

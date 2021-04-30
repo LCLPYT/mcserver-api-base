@@ -52,6 +52,11 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
                 }
             });
         } else { // otherwise assume the argument is a username.
+            bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
+                    .thenTranslate("mc.resolving_player", MCMessage.blank()
+                            .setColor(MCMessage.MessageColor.YELLOW)
+                            .text(argument)));
+
             bridge.getPlayerByName(argument, getAPI()).thenAccept(fetchedTarget -> {
                 if(fetchedTarget == null) { // there was an error or no player was found
                     bridge.sendMessageTo(playerUuid, MCMessage.error()
@@ -82,9 +87,11 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
 
         if(!invokerUuid.equals(targetUuid)) {
             bridge.getPlayerNameByUUID(targetUuid).thenAccept(name -> {
-                MCMessage nameMsg = MCMessage.blank().text(name);
-                bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.loading", nameMsg));
-                fetchActual(invokerUuid, targetUuid, MCMessage.blank().thenTranslate("stats.title.player", nameMsg));
+                bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.loading", MCMessage.blank()
+                        .setColor(MCMessage.MessageColor.YELLOW)
+                        .text(name)));
+                fetchActual(invokerUuid, targetUuid, MCMessage.blank().thenTranslate("stats.title.player", MCMessage.blank()
+                        .text(name)));
             });
             return;
         }
