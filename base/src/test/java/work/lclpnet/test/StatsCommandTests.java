@@ -55,7 +55,7 @@ public class StatsCommandTests {
 
         @Override
         public void openStats(String invokerUuid, String targetUuid, MCMessage title, MCStats targetStats) {
-            System.out.println("Success: " + RawMCMessageImplementation.convertMCMessageToString(title, "en_us"));
+            System.out.println("Success: " + RawMCMessageImplementation.convertMCMessageToString(title, "en_us") + " " + targetStats);
         }
 
     };
