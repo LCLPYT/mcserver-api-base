@@ -53,7 +53,7 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
             });
         } else { // otherwise assume the argument is a username.
             bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
-                    .thenTranslate("mc.resolving_player", MCMessage.blank()
+                    .thenTranslate("mc.search_player", MCMessage.blank()
                             .setColor(MCMessage.MessageColor.YELLOW)
                             .text(argument)));
 
