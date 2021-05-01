@@ -50,9 +50,6 @@ public class CommandStats extends PlatformCommandSchemeBase implements StatsComm
         String title = BukkitMCMessageImplementation.convertMCMessageToString(titleMsg, invoker);
 
         List<MCStats.Entry> entries = new ArrayList<>(targetStats.getStats());
-        entries.addAll(targetStats.getStats());
-        entries.addAll(targetStats.getStats());
-        entries.addAll(targetStats.getStats());
         MCStats.Entry mainEntry = targetStats.getModule("general");
         if(mainEntry != null) entries.remove(mainEntry);
 
