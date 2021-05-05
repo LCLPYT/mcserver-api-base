@@ -6,7 +6,7 @@
 
 package work.lclpnet.serverimpl.bukkit.util;
 
-import work.lclpnet.serverapi.util.ILogger;
+import work.lclpnet.translations.util.ILogger;
 
 import java.util.logging.Logger;
 

@@ -20,10 +20,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import work.lclpnet.lclpnetwork.facade.MCStats;
 import work.lclpnet.serverapi.cmd.StatsCommandScheme;
 import work.lclpnet.serverapi.translate.MCMessage;
-import work.lclpnet.serverapi.translate.ServerTranslation;
 import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
 import work.lclpnet.serverimpl.bukkit.util.BukkitMCMessageImplementation;
 import work.lclpnet.serverimpl.bukkit.util.StatsManager;
+import work.lclpnet.translations.Translations;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -253,7 +253,7 @@ public class CommandStats extends PlatformCommandSchemeBase implements StatsComm
             Date date = value.getAsDate();
             if(date == null) return getTranslation(viewer, "stats.value.never");
 
-            SimpleDateFormat format = ServerTranslation.getDateFormat(viewer.getLocale());
+            SimpleDateFormat format = Translations.getDateFormat(viewer.getLocale());
             return format.format(date);
         } else return value.getValueAsFormattedString();
     }

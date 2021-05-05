@@ -46,12 +46,6 @@ public class MCServerBukkit extends JavaPlugin {
     public void onLoad() {
         loadConfig();
 
-        try {
-            BukkitServerTranslation.init(this);
-        } catch (IOException e) {
-            throw new IllegalStateException("Could not initialize translation service", e);
-        }
-
         String token;
         try {
             token = loadToken();
@@ -75,6 +69,12 @@ public class MCServerBukkit extends JavaPlugin {
 
         API = new MCServerAPI(authAccess);
         Bukkit.getConsoleSender().sendMessage(String.format("%s%sLogged into LCLPNetwork successfully.", pre, ChatColor.GREEN));
+
+        try {
+            BukkitServerTranslation.init(this);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not initialize translation service", e);
+        }
     }
 
     @Override

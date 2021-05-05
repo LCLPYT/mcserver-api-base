@@ -64,8 +64,9 @@ repositories {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
     implementation 'work.lclpnet:lclpnetwork-api:1.1.3'
-    implementation 'work.lclpnet.mcserver-api:mcserver-api-base:0.5.7'
+    implementation 'work.lclpnet.mcserver-api:mcserver-api-base:0.6.0'
     implementation 'work.lclpnet:lclpstorage:1.0.0'
+    implementation 'work.lclpnet:translations:1.0.3'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
@@ -85,12 +86,14 @@ shadowJar {
         include(dependency('work.lclpnet:lclpnetwork-api:.*'))
         include(dependency('work.lclpnet.mcserver-api:mcserver-api-base:.*'))
         include(dependency('work.lclpnet:lclpstorage:.*'))
+        include(dependency('work.lclpnet:translations:.*'))
     }
 
     // Relocate to prevent conflicts with other mods that include it
     relocate 'work.lclpnet.lclpnetwork', 'mcsapi.work.lclpnet.lclpnetwork'
     relocate 'work.lclpnet.serverapi', 'mcsapi.work.lclpnet.serverapi'
     relocate 'work.lclpnet.storage', 'mcsapi.work.lclpnet.storage'
+    relocate 'work.lclpnet.translations', 'mcsapi.work.lclpnet.translations'
 
     archiveClassifier.set('') // Replace the default JAR
 }

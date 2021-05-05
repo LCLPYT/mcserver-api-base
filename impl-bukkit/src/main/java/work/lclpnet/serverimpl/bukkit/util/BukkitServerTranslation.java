@@ -8,13 +8,16 @@ package work.lclpnet.serverimpl.bukkit.util;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import work.lclpnet.serverapi.translate.DefaultTranslationLoader;
-import work.lclpnet.serverapi.translate.DefaultTranslationLocator;
-import work.lclpnet.serverapi.translate.ServerTranslation;
-import work.lclpnet.serverapi.util.ILogger;
+import work.lclpnet.lclpnetwork.api.APIAccess;
+import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
+import work.lclpnet.translations.Translations;
+import work.lclpnet.translations.io.JarTranslationLocator;
+import work.lclpnet.translations.io.ResourceTranslationLoader;
+import work.lclpnet.translations.network.LCLPNetworkTranslations;
+import work.lclpnet.translations.util.ILogger;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 
 public class BukkitServerTranslation {
 
@@ -22,14 +25,17 @@ public class BukkitServerTranslation {
         Class<?> clazz = BukkitServerTranslation.class;
         ILogger logger = new BukkitLogger(plugin.getLogger());
 
-        DefaultTranslationLocator locator = new DefaultTranslationLocator(clazz, logger, Arrays.asList("resource/mcsapi/lang/", "resource/bukkit/lang/"));
-        DefaultTranslationLoader loader = new DefaultTranslationLoader(locator, plugin::getResource, clazz, logger);
+        JarTranslationLocator locator = new JarTranslationLocator(clazz, logger, Collections.singletonList("resource/bukkit/lang/"));
+        ResourceTranslationLoader loader = new ResourceTranslationLoader(locator, plugin::getResource, logger);
 
-        ServerTranslation.loadFrom(loader);
+        Translations.loadFrom(loader);
+
+        APIAccess.PUBLIC.setHost(MCServerBukkit.getAPI().getAPIAccess().getHost());
+        LCLPNetworkTranslations.loadApplications(logger, "mc_server").join();
     }
 
     public static String getTranslation(Player player, String key, Object... substitutes) {
-        return ServerTranslation.getTranslation(player.getLocale(), key, substitutes);
+        return Translations.getTranslation(player.getLocale(), key, substitutes);
     }
 
 }
