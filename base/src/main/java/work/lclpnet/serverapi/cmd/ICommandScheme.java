@@ -15,7 +15,7 @@ public interface ICommandScheme {
 
     void execute(String playerUuid, Object[] args);
 
-    public interface IPlatformCommandScheme extends ICommandScheme {
+    interface IPlatformCommandScheme extends ICommandScheme {
 
         MCServerAPI getAPI();
 
