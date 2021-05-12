@@ -49,11 +49,12 @@ public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandSc
             if(success == null || !success) getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error"));
             else {
                 MCMessage langMsg = MCMessage.blank();
-                if(argument.equals("auto")) langMsg.text(argument);
-                else langMsg.thenTranslate("netlang.use-client");
+                if(argument.equals("auto")) langMsg.thenTranslate("netlang.use-client");
+                else langMsg.text(argument);
                 langMsg.setColor(MCMessage.MessageColor.YELLOW);
 
                 getPlatformBridge().sendMessageTo(playerUuid, MCMessage.prefixed().thenTranslate("netlang.updated", langMsg));
+                ServerCache.refreshPlayer(getAPI(), playerUuid); // load the change
             }
         });
     }

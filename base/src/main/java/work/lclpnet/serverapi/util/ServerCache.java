@@ -55,6 +55,12 @@ public class ServerCache {
         return Translations.loadAsyncFrom(loader);
     }
 
+    public static CompletableFuture<Void> refreshPlayer(MCServerAPI api, String uuid) {
+        return api.getMCPlayerByUUID(uuid).thenAccept(player -> {
+            if(player != null) cachePlayer(player);
+        });
+    }
+
     /* Those methods should be called from somewhere in the implementation */
 
     /**
