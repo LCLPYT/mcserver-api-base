@@ -95,18 +95,19 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     @AuthRequired
     @Scopes("minecraft[admin]")
     public CompletableFuture<MCPlayer> updateLastSeen(String playerUuid, boolean doServerCache) {
-        return api.post("api/mc/admin/update-last-seen", JsonBuilder.object().set("uuid", playerUuid).createObject())
-                .thenApply(resp -> {
-                    if(resp.getResponseCode() != 200) return null;
+        return api.post("api/mc/admin/update-last-seen", JsonBuilder.object()
+                .set("uuid", playerUuid)
+                .createObject()).thenApply(resp -> {
+            if(resp.getResponseCode() != 200) return null;
 
-                    JsonObject obj = resp.getResponseAs(JsonObject.class);
-                    JsonElement elem = obj.get("player");
-                    if(elem == null) return null;
+            JsonObject obj = resp.getResponseAs(JsonObject.class);
+            JsonElement elem = obj.get("player");
+            if(elem == null) return null;
 
-                    MCPlayer player = MCPlayer.cast(elem, MCPlayer.class);
-                    if(player != null) ServerCache.cachePlayer(player);
-                    return player;
-                });
+            MCPlayer player = MCPlayer.cast(elem, MCPlayer.class);
+            if(doServerCache && player != null) ServerCache.cachePlayer(player);
+            return player;
+        });
     }
 
     /**

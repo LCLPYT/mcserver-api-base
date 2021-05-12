@@ -51,14 +51,9 @@ public class MCServerTests {
         assertTrue(operator);
     }
 
-    /**
-     * This test currently only works when there is a development server of LCLPNetwork running on http://localhost:8000.
-     * TODO: Update this when there is a staging server.
-     * @throws IOException If there was an auth error.
-     */
     @Test
     void updateLastSeen() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         MCPlayer success = instance.updateLastSeen("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
         assertNotNull(success);
@@ -66,7 +61,7 @@ public class MCServerTests {
 
     /*@Test
     void processMCLinkToken() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         String token = "27d23437-6ac0-438a-94b5-184d69ed1c99";
         Boolean success = instance.processMCLinkToken("7357a549-fa3e-4342-91b2-63e5e73ed39a", token).join();
@@ -75,7 +70,7 @@ public class MCServerTests {
 
     /*@Test
     void requestMCLinkReverseToken() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         MCLinkResponse linkResponse = instance.requestMCLinkReverseToken("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
         assertNotNull(linkResponse);
@@ -85,7 +80,7 @@ public class MCServerTests {
 
     @Test
     void incrementStat() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         IncrementTransaction.Item coins = new IncrementTransaction.Item(StatItems.COINS, 1);
         IncrementTransaction.Item points = new IncrementTransaction.Item(StatItems.POINTS, 1);
@@ -97,7 +92,7 @@ public class MCServerTests {
 
     @Test
     void incrementMassStat() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         IncrementResult result = instance.incrementStat(new MassIncrementTransaction(StatTypes.CURRENCY)
                 .add("7357a549-fa3e-4342-91b2-63e5e73ed39a", StatItems.POINTS, 5)
@@ -110,7 +105,7 @@ public class MCServerTests {
 
     @Test
     void getRegisteredLanguages() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         List<String> languages = instance.getRegisteredLanguages().join();
         assertNotNull(languages);
@@ -118,7 +113,7 @@ public class MCServerTests {
 
     @Test
     void setPreferredLanguage() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         Boolean result = instance.setPreferredLanguage("7357a549-fa3e-4342-91b2-63e5e73ed39a", "en_us").join();
         assertNotNull(result);
@@ -127,14 +122,12 @@ public class MCServerTests {
 
     @Test
     void setPreferredLanguageNotRegistered() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         Boolean result = instance.setPreferredLanguage("7357a549-fa3e-4342-91b2-63e5e73ed39a", "xyz").join();
         assertNotNull(result);
         assertFalse(result);
     }
-
-
 
     /* */
 
