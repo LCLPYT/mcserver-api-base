@@ -6,6 +6,7 @@
 
 package work.lclpnet.serverapi;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import work.lclpnet.lclpnetwork.api.APIAccess;
@@ -19,7 +20,10 @@ import work.lclpnet.serverapi.api.IncrementResult;
 import work.lclpnet.serverapi.api.IncrementTransaction;
 import work.lclpnet.serverapi.api.MCLinkResponse;
 import work.lclpnet.serverapi.api.MassIncrementTransaction;
+import work.lclpnet.serverapi.util.ServerCache;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class MCServerAPI extends LCLPMinecraftAPI {
@@ -72,13 +76,37 @@ public class MCServerAPI extends LCLPMinecraftAPI {
      * If there is no MCPlayer with that UUID, it will be created.
      *
      * @param playerUuid The UUID of the {@link MCPlayer}.
-     * @return A completable future that will contain the result of the update.
+     * @return A completable future that will contain the player, or null, if there was an error.
      */
     @AuthRequired
     @Scopes("minecraft[admin]")
-    public CompletableFuture<Boolean> updateLastSeen(String playerUuid) {
+    public CompletableFuture<MCPlayer> updateLastSeen(String playerUuid) {
+        return updateLastSeen(playerUuid, true);
+    }
+
+    /**
+     * Updates the last seen property of a {@link MCPlayer}.
+     * If there is no MCPlayer with that UUID, it will be created.
+     *
+     * @param playerUuid The UUID of the {@link MCPlayer}.
+     * @param doServerCache Whether to cache the player with the given UUID on the server.
+     * @return A completable future that will contain the player, or null, if there was an error.
+     */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<MCPlayer> updateLastSeen(String playerUuid, boolean doServerCache) {
         return api.post("api/mc/admin/update-last-seen", JsonBuilder.object().set("uuid", playerUuid).createObject())
-                .thenApply(resp -> resp.getResponseCode() == 200);
+                .thenApply(resp -> {
+                    if(resp.getResponseCode() != 200) return null;
+
+                    JsonObject obj = resp.getResponseAs(JsonObject.class);
+                    JsonElement elem = obj.get("player");
+                    if(elem == null) return null;
+
+                    MCPlayer player = MCPlayer.cast(elem, MCPlayer.class);
+                    if(player != null) ServerCache.cachePlayer(player);
+                    return player;
+                });
     }
 
     /**
@@ -164,6 +192,33 @@ public class MCServerAPI extends LCLPMinecraftAPI {
         return incrementStat(massTransaction.getStatType(), massTransaction.getTransactions());
     }
 
+    /**
+     * Gets a list of all registered languages players can set as preferred.
+     *
+     * @return A completable future that will contain the list.
+     */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<List<String>> getRegisteredLanguages() {
+        return api.get("api/mc/admin/get-registered-languages").thenApply(resp -> {
+            if(resp.getResponseCode() != 200) return null;
 
+            JsonArray arr = resp.getResponseAs(JsonArray.class);
+            List<String> languages = new ArrayList<>();
+            arr.forEach(elem -> languages.add(elem.getAsString()));
+
+            return languages;
+        });
+    }
+
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<Boolean> setPreferredLanguage(String uuid, String lang) {
+        return api.post("api/mc/admin/set-preferred-language", JsonBuilder.object()
+                .set("uuid", uuid)
+                .set("lang", lang)
+                .createObject()
+        ).thenApply(resp -> resp.getResponseCode() == 200);
+    }
 
 }
