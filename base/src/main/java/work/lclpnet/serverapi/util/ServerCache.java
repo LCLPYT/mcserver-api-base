@@ -11,6 +11,7 @@ import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.translations.Translations;
 import work.lclpnet.translations.network.LCLPNetworkTranslationLoader;
 import work.lclpnet.translations.network.LCLPTranslationAPI;
+import work.lclpnet.translations.util.ILogger;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -49,8 +50,8 @@ public class ServerCache {
         });
     }
 
-    public static CompletableFuture<Void> reloadTranslations(LCLPTranslationAPI api) throws IOException {
-        LCLPNetworkTranslationLoader loader = new LCLPNetworkTranslationLoader(Collections.singletonList("mc_server"), null, api);
+    public static CompletableFuture<Void> reloadTranslations(LCLPTranslationAPI api, @Nullable ILogger logger) throws IOException {
+        LCLPNetworkTranslationLoader loader = new LCLPNetworkTranslationLoader(Collections.singletonList("mc_server"), null, api, logger);
         return Translations.loadAsyncFrom(loader);
     }
 
@@ -61,11 +62,12 @@ public class ServerCache {
      * Implementations should call this method on their initialization.
      *
      * @param api A {@link MCServerAPI} instance to use for fetching data.
+     * @param logger An optional logger to receive information.
      * @throws IOException If there was an I/O-error in the initialization process.
      */
-    public static void init(MCServerAPI api) throws IOException {
+    public static void init(MCServerAPI api, @Nullable ILogger logger) throws IOException {
         refreshRegisteredLanguages(api).thenAccept(ignored -> {}); // language refresh can run async
-        reloadTranslations(new LCLPTranslationAPI(api.getAPIAccess())).join(); // should run synchronous
+        reloadTranslations(new LCLPTranslationAPI(api.getAPIAccess()), logger).join(); // should run synchronous
     }
 
     /**

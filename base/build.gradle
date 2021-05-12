@@ -37,7 +37,7 @@ dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.0'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'work.lclpnet:lclpnetwork-api:1.1.0'
-    implementation 'work.lclpnet:translations:1.0.0'
+    implementation 'work.lclpnet:translations:1.0.3'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
