@@ -43,7 +43,7 @@ public class MCServerTests {
 
     @Test
     void isNetworkOperator() throws IOException {
-        MCServerAPI instance = getAuth();
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
 
         Boolean operator = instance.isNetworkOperator("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
