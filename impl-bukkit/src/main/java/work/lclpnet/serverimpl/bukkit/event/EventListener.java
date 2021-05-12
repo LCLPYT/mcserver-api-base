@@ -14,9 +14,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import work.lclpnet.lclpnetwork.facade.MCStats;
+import work.lclpnet.serverapi.util.ServerCache;
 import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
 import work.lclpnet.serverimpl.bukkit.cmd.CommandStats;
 import work.lclpnet.serverimpl.bukkit.util.StatsManager;
@@ -30,10 +32,16 @@ public class EventListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 
-        MCServerBukkit.getAPI().updateLastSeen(p.getUniqueId().toString()).thenAccept(success -> {
-            if(!success)
+        MCServerBukkit.getAPI().updateLastSeen(p.getUniqueId().toString()).thenAccept(player -> {
+            if(player == null)
                 MCServerBukkit.getPlugin().getLogger().warning(String.format("Could not update last seen for player '%s'.", p.getName()));
         });
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        Player p = e.getPlayer();
+        ServerCache.dropAllCachesFor(p.getUniqueId().toString());
     }
 
     @EventHandler(priority = EventPriority.HIGH)

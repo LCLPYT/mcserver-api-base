@@ -15,6 +15,7 @@ public class BukkitCommands {
     public static void register(JavaPlugin plugin) {
         registerCommand(plugin, "mclink", new CommandMCLink());
         registerCommand(plugin, "stats", new CommandStats());
+        registerCommand(plugin, "language", new CommandLanguage());
     }
 
     private static void registerCommand(JavaPlugin plugin, String name, CommandExecutor executor) {

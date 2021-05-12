@@ -8,19 +8,24 @@ package work.lclpnet.serverimpl.bukkit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import work.lclpnet.lclpnetwork.api.APIAccess;
 import work.lclpnet.lclpnetwork.api.APIAuthAccess;
 import work.lclpnet.lclpnetwork.util.Utils;
 import work.lclpnet.serverapi.MCServerAPI;
+import work.lclpnet.serverapi.util.ServerCache;
 import work.lclpnet.serverimpl.bukkit.cmd.BukkitCommands;
 import work.lclpnet.serverimpl.bukkit.event.EventListener;
+import work.lclpnet.serverimpl.bukkit.util.BukkitLogger;
 import work.lclpnet.serverimpl.bukkit.util.BukkitServerTranslation;
 import work.lclpnet.storage.LocalLCLPStorage;
+import work.lclpnet.translations.util.ILogger;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -70,8 +75,16 @@ public class MCServerBukkit extends JavaPlugin {
         API = new MCServerAPI(authAccess);
         Bukkit.getConsoleSender().sendMessage(String.format("%s%sLogged into LCLPNetwork successfully.", pre, ChatColor.GREEN));
 
+        ILogger logger = new BukkitLogger(getLogger());
+
         try {
-            BukkitServerTranslation.init(this);
+            ServerCache.init(API, logger);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not initialize ServerCache", e);
+        }
+
+        try {
+            BukkitServerTranslation.init(this, logger);
         } catch (IOException e) {
             throw new IllegalStateException("Could not initialize translation service", e);
         }
@@ -83,6 +96,8 @@ public class MCServerBukkit extends JavaPlugin {
 
         registerListeners();
         BukkitCommands.register(this);
+
+        cacheOnlinePlayers();
 
         Bukkit.getConsoleSender().sendMessage(String.format("%s%sPlugin enabled.", pre, ChatColor.GREEN));
     }
@@ -100,6 +115,11 @@ public class MCServerBukkit extends JavaPlugin {
         }
 
         Bukkit.getConsoleSender().sendMessage(String.format("%s%sPlugin disabled.", pre, ChatColor.RED));
+    }
+
+    private void cacheOnlinePlayers() {
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        players.forEach(player -> ServerCache.refreshPlayer(API, player.getUniqueId().toString()));
     }
 
     private void registerListeners() {

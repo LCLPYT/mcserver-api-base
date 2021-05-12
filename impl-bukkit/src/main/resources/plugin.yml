@@ -11,3 +11,6 @@ commands:
     description: Link your Minecraft account with your LCLPNetwork account.
   stats:
     description: View a player's stats.
+  language:
+    description: Set your preferred language.
+    aliases: [lang]
