@@ -12,9 +12,12 @@ import work.lclpnet.lclpnetwork.api.APIAccess;
 import work.lclpnet.lclpnetwork.api.APIAuthAccess;
 import work.lclpnet.lclpnetwork.api.APIException;
 import work.lclpnet.serverapi.MCServerAPI;
+import work.lclpnet.serverapi.api.*;
 
 import javax.annotation.Nullable;
 import java.io.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -77,6 +80,31 @@ public class MCServerTests {
         assertFalse(linkResponse.isAlreadyLinked());
         assertNotNull(linkResponse.getToken());
     }*/
+
+    @Test
+    void incrementStat() throws IOException {
+        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        assertNotNull(instance);
+        IncrementTransaction.Item coins = new IncrementTransaction.Item(StatItems.COINS, 1);
+        IncrementTransaction.Item points = new IncrementTransaction.Item(StatItems.POINTS, 1);
+        IncrementTransaction transaction = new IncrementTransaction("7357a549-fa3e-4342-91b2-63e5e73ed39a", Arrays.asList(coins, points));
+        IncrementResult result = instance.incrementStat(StatTypes.CURRENCY, Collections.singletonList(transaction)).join();
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void incrementMassStat() throws IOException {
+        MCServerAPI instance = getAuth("localToken", "http://localhost:8000");
+        assertNotNull(instance);
+        IncrementResult result = instance.incrementStat(new MassIncrementTransaction(StatTypes.CURRENCY)
+                .add("7357a549-fa3e-4342-91b2-63e5e73ed39a", StatItems.POINTS, 5)
+                .add("7357a549-fa3e-4342-91b2-63e5e73ed39a", StatItems.COINS, 2)
+                .add("4eb6bcf7-023f-4b57-b0c3-716a9dbba51f", StatItems.COINS, 3)
+        ).join();
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
+    }
 
     /* */
 

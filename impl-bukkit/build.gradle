@@ -136,6 +136,6 @@ tasks.publish.dependsOn({
 
 processResources {
     from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: [version: version]
+        filter ReplaceTokens, tokens: [version: getVersion(false)]
     }
 }

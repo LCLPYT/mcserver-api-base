@@ -15,7 +15,10 @@ import work.lclpnet.lclpnetwork.api.annotation.Scopes;
 import work.lclpnet.lclpnetwork.ext.LCLPMinecraftAPI;
 import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.lclpnetwork.util.JsonBuilder;
+import work.lclpnet.serverapi.api.IncrementResult;
+import work.lclpnet.serverapi.api.IncrementTransaction;
 import work.lclpnet.serverapi.api.MCLinkResponse;
+import work.lclpnet.serverapi.api.MassIncrementTransaction;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -71,6 +74,8 @@ public class MCServerAPI extends LCLPMinecraftAPI {
      * @param playerUuid The UUID of the {@link MCPlayer}.
      * @return A completable future that will contain the result of the update.
      */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
     public CompletableFuture<Boolean> updateLastSeen(String playerUuid) {
         return api.post("api/mc/admin/update-last-seen", JsonBuilder.object().set("uuid", playerUuid).createObject())
                 .thenApply(resp -> resp.getResponseCode() == 200);
@@ -89,6 +94,8 @@ public class MCServerAPI extends LCLPMinecraftAPI {
      * @param token The MCLinkToken (in form of an UUID, not to confuse with the playerUuid) that a player sent to the minecraft server.
      * @return A completable future that will contain the processing result.
      */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
     public CompletableFuture<Boolean> processMCLinkToken(String playerUuid, String token) {
         return api.post("api/mc/admin/process-mclink-token", JsonBuilder.object()
                 .set("mcUuid", playerUuid)
@@ -97,6 +104,16 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .thenApply(resp -> resp.getResponseCode() == 201);
     }
 
+    /**
+     * Requests a reverse MCLink token which can be sent to a player.
+     * The player may then open a link with the token in order to link their accounts.
+     * This should be called from servers, which can verify the integrity of a player UUID by a valid Yggdrasil session.
+     *
+     * @param uuid The UUID of the Minecraft player that requested the MC-link.
+     * @return A completable future that will contain the {@link MCLinkResponse}.
+     */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
     public CompletableFuture<MCLinkResponse> requestMCLinkReverseToken(String uuid) {
         return api.post("api/mc/admin/request-mclink-reverse-token", JsonBuilder.object()
                 .set("uuid", uuid)
@@ -115,5 +132,38 @@ public class MCServerAPI extends LCLPMinecraftAPI {
             return new MCLinkResponse(false, elem.getAsString());
         });
     }
+
+    /**
+     * Gives a certain amount of coins to the {@link MCPlayer} with the given UUID.
+     *
+     * @param statType The type of stat to increment. E.g. 'currency'.
+     * @param transactions A list of increment transactions to send.
+     * @return A completable future that will contain the {@link IncrementResult}.
+     */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<IncrementResult> incrementStat(String statType, Iterable<IncrementTransaction> transactions) {
+        return api.post("api/mc/admin/increment-stat", JsonBuilder.object()
+                .set("statType", statType)
+                .beginArray("transactions").addAll(transactions).endArray()
+                .createObject()).thenApply(resp -> {
+            if(resp.getResponseCode() != 200) return null;
+            else return resp.getResponseAs(IncrementResult.class);
+        });
+    }
+
+    /**
+     * Gives a certain amount of coins to the {@link MCPlayer} with the given UUID.
+     *
+     * @param massTransaction A {@link MassIncrementTransaction} instance to increment multiple target's stats.
+     * @return A completable future that will contain the {@link IncrementResult}.
+     */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<IncrementResult> incrementStat(MassIncrementTransaction massTransaction) {
+        return incrementStat(massTransaction.getStatType(), massTransaction.getTransactions());
+    }
+
+
 
 }
