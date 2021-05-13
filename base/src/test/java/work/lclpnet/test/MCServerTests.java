@@ -129,6 +129,14 @@ public class MCServerTests {
         assertFalse(result);
     }
 
+    @Test
+    void getPlayersRankedByPoints() throws IOException {
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        assertNotNull(instance);
+        List<MCPlayer> players = instance.getPlayersRankedBy("points", 3).join();
+        assertNotNull(players);
+    }
+
     /* */
 
     @Nullable

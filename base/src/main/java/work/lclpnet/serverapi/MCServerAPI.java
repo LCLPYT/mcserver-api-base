@@ -212,6 +212,13 @@ public class MCServerAPI extends LCLPMinecraftAPI {
         });
     }
 
+    /**
+     * Sets the preferred language of a player.
+     *
+     * @param uuid The player UUID.
+     * @param lang A registered language to prefer.
+     * @return A completable future that will contain the result.
+     */
     @AuthRequired
     @Scopes("minecraft[admin]")
     public CompletableFuture<Boolean> setPreferredLanguage(String uuid, String lang) {
@@ -220,6 +227,23 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("lang", lang)
                 .createObject()
         ).thenApply(resp -> resp.getResponseCode() == 200);
+    }
+
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<List<MCPlayer>> getPlayersRankedBy(String property, int amount) {
+        return api.post("api/mc/admin/get-players-ranked", JsonBuilder.object()
+                .set("property", property)
+                .set("amount", amount)
+                .createObject()).thenApply(resp -> {
+            if(resp.getResponseCode() != 200) return null;
+
+            JsonArray arr = resp.getResponseAs(JsonArray.class);
+            List<MCPlayer> players = new ArrayList<>();
+            arr.forEach(elem -> players.add(MCPlayer.cast(elem, MCPlayer.class)));
+
+            return players;
+        });
     }
 
 }
