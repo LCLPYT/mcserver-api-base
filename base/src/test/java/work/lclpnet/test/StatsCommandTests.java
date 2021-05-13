@@ -15,6 +15,7 @@ import work.lclpnet.serverapi.translate.MCMessage;
 import work.lclpnet.serverapi.translate.RawMCMessageImplementation;
 import work.lclpnet.serverapi.util.IPlatformBridge;
 import work.lclpnet.serverapi.util.MojangAPI;
+import work.lclpnet.serverapi.util.TransactionMessenger;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -100,6 +101,12 @@ public class StatsCommandTests {
     void justTrash() throws InterruptedException {
         testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "hfuiahjfaafdhjlkfhjklfdashjfadshjkl7z234" });
         Thread.sleep(2000L);
+    }
+
+    @Test
+    void transactionMessenger() {
+        TransactionMessenger.sendStatChangeMessage(testBridge, "7357a549-fa3e-4342-91b2-63e5e73ed39a", "stat.general.coins", 5);
+        TransactionMessenger.sendStatChangeMessage(testBridge, "7357a549-fa3e-4342-91b2-63e5e73ed39a", "stat.general.coins", -2);
     }
 
 }
