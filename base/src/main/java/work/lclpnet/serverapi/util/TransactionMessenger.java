@@ -38,4 +38,12 @@ public class TransactionMessenger {
         );
     }
 
+    public static void sendCoinsChange(IPlatformBridge bridge, String playerUuid, int amount) {
+        sendStatChangeMessage(bridge, playerUuid, "stat.general.coins", amount);
+    }
+
+    public static void sendPointsChange(IPlatformBridge bridge, String playerUuid, int amount) {
+        sendStatChangeMessage(bridge, playerUuid, "stat.general.points", amount);
+    }
+
 }
