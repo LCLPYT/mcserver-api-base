@@ -6,10 +6,8 @@
 
 package work.lclpnet.serverapi.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class MassIncrementTransaction {
 
@@ -26,6 +24,10 @@ public class MassIncrementTransaction {
     }
 
     public MassIncrementTransaction add(String uuid, String type, int amount) {
+        return this.add(uuid, type, amount, null);
+    }
+
+    public MassIncrementTransaction add(String uuid, String type, int amount, @Nullable Map<String, Object> extra) {
         Objects.requireNonNull(uuid);
         Objects.requireNonNull(type);
 
@@ -39,9 +41,11 @@ public class MassIncrementTransaction {
         Optional<IncrementTransaction.Item> existingItem = transaction.getItemFor(type);
         if(!existingItem.isPresent()) {
             IncrementTransaction.Item item = new IncrementTransaction.Item(type, amount);
+            if(extra != null) extra.forEach(item::setExtraProperty);
             transaction.addItem(item);
         } else {
             IncrementTransaction.Item item = existingItem.get();
+            if(extra != null) extra.forEach(item::setExtraProperty);
             item.setAmount(item.getAmount() + amount);
         }
 

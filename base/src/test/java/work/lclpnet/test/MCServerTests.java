@@ -104,6 +104,18 @@ public class MCServerTests {
     }
 
     @Test
+    void incrementMassCurrency() throws IOException {
+        MCServerAPI instance = getAuth("localToken", "http://localhost:8000"); // TODO staging
+        assertNotNull(instance);
+        IncrementResult result = instance.incrementStat(new CurrencyMassIncrementTransaction()
+                .addCoins("7357a549-fa3e-4342-91b2-63e5e73ed39a", 5, "mcserver.tests.grant", true)
+                .addCoins("4eb6bcf7-023f-4b57-b0c3-716a9dbba51f", 2, "MCServer Tests", false)
+        ).join();
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
     void getRegisteredLanguages() throws IOException {
         MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);

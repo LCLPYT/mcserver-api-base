@@ -9,9 +9,7 @@ package work.lclpnet.serverapi.api;
 import com.google.gson.annotations.Expose;
 import work.lclpnet.lclpnetwork.facade.JsonSerializable;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class IncrementTransaction extends JsonSerializable {
 
@@ -48,6 +46,8 @@ public class IncrementTransaction extends JsonSerializable {
         private final String type;
         @Expose
         private int amount;
+        @Expose
+        private Map<String, Object> extra;
 
         public Item(String type, int amount) {
             this.type = Objects.requireNonNull(type);
@@ -65,6 +65,21 @@ public class IncrementTransaction extends JsonSerializable {
 
         public int getAmount() {
             return amount;
+        }
+
+        public Map<String, Object> getExtra() {
+            return extra;
+        }
+
+        public void setExtra(Map<String, Object> extra) {
+            this.extra = extra;
+        }
+
+        public void setExtraProperty(String key, Object value) {
+            Objects.requireNonNull(key);
+            Objects.requireNonNull(value);
+            if(getExtra() == null) setExtra(new HashMap<>());
+            this.extra.put(key, value);
         }
 
     }
