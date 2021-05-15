@@ -16,12 +16,10 @@ import work.lclpnet.lclpnetwork.api.annotation.Scopes;
 import work.lclpnet.lclpnetwork.ext.LCLPMinecraftAPI;
 import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.lclpnetwork.util.JsonBuilder;
-import work.lclpnet.serverapi.api.IncrementResult;
-import work.lclpnet.serverapi.api.IncrementTransaction;
-import work.lclpnet.serverapi.api.MCLinkResponse;
-import work.lclpnet.serverapi.api.MassIncrementTransaction;
+import work.lclpnet.serverapi.api.*;
 import work.lclpnet.serverapi.util.ServerCache;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -229,6 +227,13 @@ public class MCServerAPI extends LCLPMinecraftAPI {
         ).thenApply(resp -> resp.getResponseCode() == 200);
     }
 
+    /**
+     * Gets a list of players ranked by a property with the given size.
+     *
+     * @param property The property to rank the players by.
+     * @param amount The size of the returned list.
+     * @return A completable future that will contain the fetched ranked list of players.
+     */
     @AuthRequired
     @Scopes("minecraft[admin]")
     public CompletableFuture<List<MCPlayer>> getPlayersRankedBy(String property, int amount) {
@@ -243,6 +248,34 @@ public class MCServerAPI extends LCLPMinecraftAPI {
             arr.forEach(elem -> players.add(MCPlayer.cast(elem, MCPlayer.class)));
 
             return players;
+        });
+    }
+
+    /**
+     * Creates a coin transaction that will consume a given amount of coins by a given payer.
+     * If the recipient is set, the recipient will receive the coins.
+     *
+     * @param payerUuid The UUID of the player who pays the coins.
+     * @param recipientUuid The optional UUID of the player who receives the coins. If null, the coins will be payed to the server.
+     * @param amount The amount of coins involved in this transaction.
+     * @param itemName The title of the transaction. Can be a translation key, if the "itemNameTranslated" param is set to true.
+     * @param itemNameTranslated Whether the "itemName" is a translation key.
+     * @return A completable future that will contain the {@link TransactionResult}.
+     */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<TransactionResult> makeCoinTransaction(String payerUuid, @Nullable String recipientUuid, int amount, String itemName, boolean itemNameTranslated) {
+        JsonBuilder builder = JsonBuilder.object()
+                .set("payer_uuid", payerUuid)
+                .set("amount", amount)
+                .set("item_name", itemName)
+                .set("is_name_translated", itemNameTranslated);
+
+        if(recipientUuid != null) builder.set("recipient_uuid", recipientUuid);
+
+        return api.post("api/mc/admin/make-coin-transaction", builder.createObject()).thenApply(resp -> {
+            if(resp.getResponseCode() != 200 && resp.getResponseCode() != 201) return null;
+            else return resp.getResponseAs(TransactionResult.class);
         });
     }
 

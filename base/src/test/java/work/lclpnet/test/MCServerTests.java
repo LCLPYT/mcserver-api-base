@@ -105,12 +105,33 @@ public class MCServerTests {
 
     @Test
     void incrementMassCurrency() throws IOException {
-        MCServerAPI instance = getAuth("localToken", "http://localhost:8000"); // TODO staging
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
         assertNotNull(instance);
         IncrementResult result = instance.incrementStat(new CurrencyMassIncrementTransaction()
                 .addCoins("7357a549-fa3e-4342-91b2-63e5e73ed39a", 5, "mcserver.tests.grant", true)
                 .addCoins("4eb6bcf7-023f-4b57-b0c3-716a9dbba51f", 2, "MCServer Tests", false)
         ).join();
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void makeTransaction() throws IOException {
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        assertNotNull(instance);
+        TransactionResult result = instance.makeCoinTransaction("7357a549-fa3e-4342-91b2-63e5e73ed39a", null, 1, "Test transaction", false).join();
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void makeTransactionWithRecipient() throws IOException {
+        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        assertNotNull(instance);
+        TransactionResult result = instance.makeCoinTransaction(
+                "7357a549-fa3e-4342-91b2-63e5e73ed39a",
+                "a16bf50d-9e08-4855-826b-5922f47ff451",
+                1, "Test transfer transaction", false).join();
         assertNotNull(result);
         assertTrue(result.isSuccess());
     }
