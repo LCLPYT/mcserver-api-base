@@ -43,7 +43,7 @@ public class MCServerTests {
 
     @Test
     void isNetworkOperator() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
 
         Boolean operator = instance.isNetworkOperator("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
@@ -53,7 +53,7 @@ public class MCServerTests {
 
     @Test
     void updateLastSeen() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         MCPlayer success = instance.updateLastSeen("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
         assertNotNull(success);
@@ -61,7 +61,7 @@ public class MCServerTests {
 
     /*@Test
     void processMCLinkToken() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         String token = "27d23437-6ac0-438a-94b5-184d69ed1c99";
         Boolean success = instance.processMCLinkToken("7357a549-fa3e-4342-91b2-63e5e73ed39a", token).join();
@@ -70,7 +70,7 @@ public class MCServerTests {
 
     /*@Test
     void requestMCLinkReverseToken() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         MCLinkResponse linkResponse = instance.requestMCLinkReverseToken("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
         assertNotNull(linkResponse);
@@ -80,7 +80,7 @@ public class MCServerTests {
 
     @Test
     void incrementStat() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         IncrementTransaction.Item coins = new IncrementTransaction.Item(StatItems.COINS, 1);
         IncrementTransaction.Item points = new IncrementTransaction.Item(StatItems.POINTS, 1);
@@ -92,20 +92,21 @@ public class MCServerTests {
 
     @Test
     void incrementMassStat() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         IncrementResult result = instance.incrementStat(new MassIncrementTransaction(StatTypes.CURRENCY)
                 .add("7357a549-fa3e-4342-91b2-63e5e73ed39a", StatItems.POINTS, 5)
                 .add("7357a549-fa3e-4342-91b2-63e5e73ed39a", StatItems.COINS, 2)
                 .add("4eb6bcf7-023f-4b57-b0c3-716a9dbba51f", StatItems.COINS, 3)
         ).join();
+        System.out.println(result);
         assertNotNull(result);
         assertTrue(result.isSuccess());
     }
 
     @Test
     void incrementMassCurrency() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         IncrementResult result = instance.incrementStat(new CurrencyMassIncrementTransaction()
                 .addCoins("7357a549-fa3e-4342-91b2-63e5e73ed39a", 5, "mcserver.tests.grant", true)
@@ -117,7 +118,7 @@ public class MCServerTests {
 
     @Test
     void makeTransaction() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         TransactionResult result = instance.makeCoinTransaction("7357a549-fa3e-4342-91b2-63e5e73ed39a", null, 1, "Test transaction", false).join();
         assertNotNull(result);
@@ -126,7 +127,7 @@ public class MCServerTests {
 
     @Test
     void makeTransactionWithRecipient() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         TransactionResult result = instance.makeCoinTransaction(
                 "7357a549-fa3e-4342-91b2-63e5e73ed39a",
@@ -138,7 +139,7 @@ public class MCServerTests {
 
     @Test
     void getRegisteredLanguages() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         List<String> languages = instance.getRegisteredLanguages().join();
         assertNotNull(languages);
@@ -146,7 +147,7 @@ public class MCServerTests {
 
     @Test
     void setPreferredLanguage() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         Boolean result = instance.setPreferredLanguage("7357a549-fa3e-4342-91b2-63e5e73ed39a", "en_us").join();
         assertNotNull(result);
@@ -155,7 +156,7 @@ public class MCServerTests {
 
     @Test
     void setPreferredLanguageNotRegistered() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         Boolean result = instance.setPreferredLanguage("7357a549-fa3e-4342-91b2-63e5e73ed39a", "xyz").join();
         assertNotNull(result);
@@ -164,7 +165,7 @@ public class MCServerTests {
 
     @Test
     void getPlayersRankedByPoints() throws IOException {
-        MCServerAPI instance = getAuth("stagingToken", "https://staging.lclpnet.work");
+        MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         List<MCPlayer> players = instance.getPlayersRankedBy("points", 3).join();
         assertNotNull(players);
@@ -173,8 +174,13 @@ public class MCServerTests {
     /* */
 
     @Nullable
-    static MCServerAPI getAuth() throws IOException {
-        return getAuth("token", null);
+    static MCServerAPI localAuth() throws IOException {
+        return getAuth("localToken", "http://localhost:8000");
+    }
+
+    @Nullable
+    static MCServerAPI stagingAuth() throws IOException {
+        return getAuth("stagingToken", "https://staging.lclpnet.work");
     }
 
     @Nullable
