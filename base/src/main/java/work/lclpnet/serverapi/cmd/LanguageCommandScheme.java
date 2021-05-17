@@ -41,7 +41,10 @@ public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandSc
         }
 
         if(!registeredLanguages.contains(argument)) {
-            getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error.lang-not-registered"));
+            getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error.lang-not-registered", MCMessage.blank()
+                    .text(argument)
+                    .setColor(MCMessage.MessageColor.YELLOW)
+            ));
             return CompletableFuture.completedFuture(false);
         }
 
