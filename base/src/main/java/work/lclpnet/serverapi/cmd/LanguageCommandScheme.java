@@ -13,7 +13,7 @@ import work.lclpnet.serverapi.util.ServerCache;
 
 import java.util.List;
 
-public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandScheme {
+public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandScheme, IDebuggable {
 
     @Override
     default String getName() {
@@ -45,18 +45,23 @@ public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandSc
             return;
         }
 
-        getAPI().setPreferredLanguage(playerUuid, argument).thenAccept(success -> {
-            if(success == null || !success) getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error"));
-            else {
-                MCMessage langMsg = MCMessage.blank();
-                if(argument.equals("auto")) langMsg.thenTranslate("netlang.use-client");
-                else langMsg.text(argument);
-                langMsg.setColor(MCMessage.MessageColor.YELLOW);
+        getAPI().setPreferredLanguage(playerUuid, argument)
+                .exceptionally(ex -> {
+                    if(shouldDebug()) logError(ex);
+                    return null;
+                })
+                .thenAccept(success -> {
+                    if(success == null || !success) getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error"));
+                    else {
+                        MCMessage langMsg = MCMessage.blank();
+                        if(argument.equals("auto")) langMsg.thenTranslate("netlang.use-client");
+                        else langMsg.text(argument);
+                        langMsg.setColor(MCMessage.MessageColor.YELLOW);
 
-                getPlatformBridge().sendMessageTo(playerUuid, MCMessage.prefixed().thenTranslate("netlang.updated", langMsg));
-                ServerCache.refreshPlayer(getAPI(), playerUuid); // load the change
-            }
-        });
+                        getPlatformBridge().sendMessageTo(playerUuid, MCMessage.prefixed().thenTranslate("netlang.updated", langMsg));
+                        ServerCache.refreshPlayer(getAPI(), playerUuid); // load the change
+                    }
+                });
     }
 
     default void fetchCurrentLang(String playerUuid) {

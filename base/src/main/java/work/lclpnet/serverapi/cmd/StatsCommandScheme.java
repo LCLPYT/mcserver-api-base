@@ -13,7 +13,7 @@ import work.lclpnet.serverapi.util.ImplementationException;
 
 import java.util.concurrent.CompletionException;
 
-public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandScheme {
+public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandScheme, IDebuggable {
 
     void openStats(String invokerUuid, String targetUuid, MCMessage title, MCStats targetStats);
 
@@ -102,13 +102,18 @@ public interface StatsCommandScheme extends ICommandScheme.IPlatformCommandSchem
 
     default void fetchActual(String invokerUuid, String targetUuid, MCMessage title) {
         IPlatformBridge bridge = getPlatformBridge();
-        getAPI().getStats(targetUuid, null).thenAccept(stats -> {
-            if(stats == null) {
-                bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.error"));
-            } else {
-                openStats(invokerUuid, targetUuid, title, stats);
-            }
-        });
+        getAPI().getStats(targetUuid, null)
+                .exceptionally(ex -> {
+                    if(shouldDebug()) logError(ex);
+                    return null;
+                })
+                .thenAccept(stats -> {
+                    if(stats == null) {
+                        bridge.sendMessageTo(invokerUuid, MCMessage.prefixed().thenTranslate("stats.error"));
+                    } else {
+                        openStats(invokerUuid, targetUuid, title, stats);
+                    }
+                });
     }
 
 }
