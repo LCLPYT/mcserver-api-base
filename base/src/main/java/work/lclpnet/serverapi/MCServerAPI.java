@@ -273,4 +273,23 @@ public class MCServerAPI extends LCLPMinecraftAPI {
         });
     }
 
+    /**
+     * Updates the last played property of a given game for given players.
+     *
+     * @param statType The game that should be updated.
+     * @param playerUuids A list of players that should be updated.
+     * @return A completable future that will contain a {@link MassUpdateResult}.
+     */
+    @AuthRequired
+    @Scopes("minecraft[admin]")
+    public CompletableFuture<MassUpdateResult> updateLastPlayed(String statType, Iterable<String> playerUuids) {
+        return api.post("api/mc/admin/update-last-played", JsonBuilder.object()
+                .set("statType", statType)
+                .beginArray("players").addAll(playerUuids).endArray()
+                .createObject()).thenApply(resp -> {
+            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            else return resp.getResponseAs(MassUpdateResult.class);
+        });
+    }
+
 }

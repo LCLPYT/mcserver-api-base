@@ -81,7 +81,6 @@ public class MCServerTests {
         IncrementTransaction.Item points = new IncrementTransaction.Item(StatItems.POINTS, 1);
         IncrementTransaction transaction = new IncrementTransaction("7357a549-fa3e-4342-91b2-63e5e73ed39a", Arrays.asList(coins, points));
         IncrementResult result = instance.incrementStat(StatTypes.CURRENCY, Collections.singletonList(transaction)).join();
-        assertNotNull(result);
         assertTrue(result.isSuccess());
     }
 
@@ -164,6 +163,17 @@ public class MCServerTests {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         instance.getPlayersRankedBy("points", 3).join();
+    }
+
+    @Test
+    void updateLastPlayed() throws IOException {
+        MCServerAPI instance = localAuth();
+        assertNotNull(instance);
+        MassUpdateResult result = instance.updateLastPlayed("arcadeParty", Arrays.asList(
+                "7357a549-fa3e-4342-91b2-63e5e73ed39a",
+                "4eb6bcf7-023f-4b57-b0c3-716a9dbba51f"
+        )).join();
+        assertTrue(result.isSuccess());
     }
 
     /* */
