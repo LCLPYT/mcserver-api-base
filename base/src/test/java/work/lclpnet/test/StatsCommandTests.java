@@ -42,6 +42,11 @@ public class StatsCommandTests {
 
     private static final StatsCommandScheme testStatsCommand = new StatsCommandScheme() {
 
+        @Override
+        public boolean shouldDebug() {
+            return true;
+        }
+
         private final MCServerAPI api = new MCServerAPI(APIAccess.PUBLIC);
 
         @Override
