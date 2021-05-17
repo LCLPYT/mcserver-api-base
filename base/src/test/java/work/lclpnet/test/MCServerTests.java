@@ -6,12 +6,11 @@
 
 package work.lclpnet.test;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 import work.lclpnet.lclpnetwork.LCLPNetworkAPI;
-import work.lclpnet.lclpnetwork.api.APIAccess;
-import work.lclpnet.lclpnetwork.api.APIAuthAccess;
-import work.lclpnet.lclpnetwork.api.APIException;
-import work.lclpnet.lclpnetwork.facade.MCPlayer;
+import work.lclpnet.lclpnetwork.api.*;
 import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverapi.api.*;
 
@@ -19,7 +18,6 @@ import javax.annotation.Nullable;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -47,7 +45,6 @@ public class MCServerTests {
         assertNotNull(instance);
 
         Boolean operator = instance.isNetworkOperator("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
-        assertNotNull(operator);
         assertTrue(operator);
     }
 
@@ -55,8 +52,7 @@ public class MCServerTests {
     void updateLastSeen() throws IOException {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
-        MCPlayer success = instance.updateLastSeen("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
-        assertNotNull(success);
+        instance.updateLastSeen("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
     }
 
     /*@Test
@@ -73,7 +69,6 @@ public class MCServerTests {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         MCLinkResponse linkResponse = instance.requestMCLinkReverseToken("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
-        assertNotNull(linkResponse);
         assertFalse(linkResponse.isAlreadyLinked());
         assertNotNull(linkResponse.getToken());
     }*/
@@ -99,8 +94,6 @@ public class MCServerTests {
                 .add("7357a549-fa3e-4342-91b2-63e5e73ed39a", StatItems.COINS, 2)
                 .add("4eb6bcf7-023f-4b57-b0c3-716a9dbba51f", StatItems.COINS, 3)
         ).join();
-        System.out.println(result);
-        assertNotNull(result);
         assertTrue(result.isSuccess());
     }
 
@@ -112,7 +105,6 @@ public class MCServerTests {
                 .addCoins("7357a549-fa3e-4342-91b2-63e5e73ed39a", 5, "mcserver.tests.grant", true)
                 .addCoins("4eb6bcf7-023f-4b57-b0c3-716a9dbba51f", 2, "MCServer Tests", false)
         ).join();
-        assertNotNull(result);
         assertTrue(result.isSuccess());
     }
 
@@ -121,7 +113,6 @@ public class MCServerTests {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         TransactionResult result = instance.makeCoinTransaction("7357a549-fa3e-4342-91b2-63e5e73ed39a", null, 1, "Test transaction", false).join();
-        assertNotNull(result);
         assertTrue(result.isSuccess());
     }
 
@@ -133,7 +124,6 @@ public class MCServerTests {
                 "7357a549-fa3e-4342-91b2-63e5e73ed39a",
                 "a16bf50d-9e08-4855-826b-5922f47ff451",
                 1, "Test transfer transaction", false).join();
-        assertNotNull(result);
         assertTrue(result.isSuccess());
     }
 
@@ -141,8 +131,7 @@ public class MCServerTests {
     void getRegisteredLanguages() throws IOException {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
-        List<String> languages = instance.getRegisteredLanguages().join();
-        assertNotNull(languages);
+        instance.getRegisteredLanguages().join();
     }
 
     @Test
@@ -150,7 +139,6 @@ public class MCServerTests {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
         Boolean result = instance.setPreferredLanguage("7357a549-fa3e-4342-91b2-63e5e73ed39a", "en_us").join();
-        assertNotNull(result);
         assertTrue(result);
     }
 
@@ -158,17 +146,24 @@ public class MCServerTests {
     void setPreferredLanguageNotRegistered() throws IOException {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
-        Boolean result = instance.setPreferredLanguage("7357a549-fa3e-4342-91b2-63e5e73ed39a", "xyz").join();
-        assertNotNull(result);
-        assertFalse(result);
+        try {
+            instance.setPreferredLanguage("7357a549-fa3e-4342-91b2-63e5e73ed39a", "xyz").join();
+            fail("Statement should not be reached.");
+        } catch (CompletionException e) {
+            APIResponse resp = ResponseEvaluationException.getResponseFromCause(e);
+            if (resp != null) {
+                JsonObject obj = resp.getErrorAs(JsonObject.class);
+                JsonElement msg = obj.get("message");
+                assertEquals("That language is not registered.", msg.getAsString());
+            } else throw e;
+        }
     }
 
     @Test
     void getPlayersRankedByPoints() throws IOException {
         MCServerAPI instance = stagingAuth();
         assertNotNull(instance);
-        List<MCPlayer> players = instance.getPlayersRankedBy("points", 3).join();
-        assertNotNull(players);
+        instance.getPlayersRankedBy("points", 3).join();
     }
 
     /* */

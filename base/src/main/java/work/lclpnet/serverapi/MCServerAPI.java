@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import work.lclpnet.lclpnetwork.api.APIAccess;
 import work.lclpnet.lclpnetwork.api.APIError;
+import work.lclpnet.lclpnetwork.api.ResponseEvaluationException;
 import work.lclpnet.lclpnetwork.api.annotation.AuthRequired;
 import work.lclpnet.lclpnetwork.api.annotation.Scopes;
 import work.lclpnet.lclpnetwork.ext.LCLPMinecraftAPI;
@@ -39,19 +40,6 @@ public class MCServerAPI extends LCLPMinecraftAPI {
      * Fetches, whether a {@link MCPlayer} is a network operator.
      * Returns null, if the there is no MCPlayer with that uuid who is currently tracked by LCLPNetwork.
      *
-     * @param player The MCPlayer to check.
-     * @return A completable future containing whether the player with the UUID is a network operator.
-     */
-    @AuthRequired
-    @Scopes("minecraft[admin]")
-    public CompletableFuture<Boolean> isNetworkOperator(MCPlayer player) {
-        return isNetworkOperator(player.getUuid());
-    }
-
-    /**
-     * Fetches, whether a {@link MCPlayer} is a network operator.
-     * Returns null, if the there is no MCPlayer with that uuid who is currently tracked by LCLPNetwork.
-     *
      * @param playerUuid The UUID of the MCPlayer, with dashes.
      * @return A completable future containing whether the player with the UUID is a network operator.
      */
@@ -59,11 +47,11 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     @Scopes("minecraft[admin]")
     public CompletableFuture<Boolean> isNetworkOperator(String playerUuid) {
         return api.post("api/mc/admin/is-network-operator", JsonBuilder.object().set("uuid", playerUuid).createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) return null;
+            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("op");
-            if(elem == null) return null;
+            if(elem == null) throw new ResponseEvaluationException(resp);
 
             return elem.getAsBoolean();
         });
@@ -96,11 +84,11 @@ public class MCServerAPI extends LCLPMinecraftAPI {
         return api.post("api/mc/admin/update-last-seen", JsonBuilder.object()
                 .set("uuid", playerUuid)
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) return null;
+            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("player");
-            if(elem == null) return null;
+            if(elem == null) throw new ResponseEvaluationException(resp);
 
             MCPlayer player = MCPlayer.cast(elem, MCPlayer.class);
             if(doServerCache && player != null) ServerCache.cachePlayer(player);
@@ -128,7 +116,10 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("mcUuid", playerUuid)
                 .set("token", token)
                 .createObject())
-                .thenApply(resp -> resp.getResponseCode() == 201);
+                .thenApply(resp -> {
+                    if(resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
+                    else return true;
+                });
     }
 
     /**
@@ -150,11 +141,11 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 if(error.has("uuid", "The uuid has already been taken."))
                     return new MCLinkResponse(true, null);
             }
-            if(resp.getResponseCode() != 201) return null;
+            if(resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("token");
-            if (elem == null) return null;
+            if (elem == null) throw new ResponseEvaluationException(resp);
 
             return new MCLinkResponse(false, elem.getAsString());
         });
@@ -174,7 +165,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("statType", statType)
                 .beginArray("transactions").addAll(transactions).endArray()
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) return null;
+            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
             else return resp.getResponseAs(IncrementResult.class);
         });
     }
@@ -200,7 +191,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     @Scopes("minecraft[admin]")
     public CompletableFuture<List<String>> getRegisteredLanguages() {
         return api.get("api/mc/admin/get-registered-languages").thenApply(resp -> {
-            if(resp.getResponseCode() != 200) return null;
+            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonArray arr = resp.getResponseAs(JsonArray.class);
             List<String> languages = new ArrayList<>();
@@ -224,7 +215,10 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("uuid", uuid)
                 .set("lang", lang)
                 .createObject()
-        ).thenApply(resp -> resp.getResponseCode() == 200);
+        ).thenApply(resp -> {
+            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            else return true;
+        });
     }
 
     /**
@@ -241,7 +235,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("property", property)
                 .set("amount", amount)
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) return null;
+            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonArray arr = resp.getResponseAs(JsonArray.class);
             List<MCPlayer> players = new ArrayList<>();
@@ -274,7 +268,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
         if(recipientUuid != null) builder.set("recipient_uuid", recipientUuid);
 
         return api.post("api/mc/admin/make-coin-transaction", builder.createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200 && resp.getResponseCode() != 201) return null;
+            if(resp.getResponseCode() != 200 && resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
             else return resp.getResponseAs(TransactionResult.class);
         });
     }
