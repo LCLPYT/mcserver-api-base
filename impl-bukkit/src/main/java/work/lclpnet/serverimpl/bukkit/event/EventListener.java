@@ -19,8 +19,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import work.lclpnet.lclpnetwork.facade.MCStats;
 import work.lclpnet.serverapi.util.ServerCache;
+import work.lclpnet.serverimpl.bukkit.Config;
 import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
-import work.lclpnet.serverimpl.bukkit.cmd.CommandStats;
+import work.lclpnet.serverimpl.bukkit.util.StatsDisplay;
 import work.lclpnet.serverimpl.bukkit.util.StatsManager;
 
 import java.util.ArrayList;
@@ -32,7 +33,10 @@ public class EventListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 
-        MCServerBukkit.getAPI().updateLastSeen(p.getUniqueId().toString()).thenAccept(player -> {
+        MCServerBukkit.getAPI().updateLastSeen(p.getUniqueId().toString()).exceptionally(ex -> {
+            if(Config.debug) ex.printStackTrace();
+            return null;
+        }).thenAccept(player -> {
             if(player == null)
                 MCServerBukkit.getPlugin().getLogger().warning(String.format("Could not update last seen for player '%s'.", p.getName()));
         });
@@ -63,7 +67,7 @@ public class EventListener implements Listener {
             List<MCStats.Entry> items = new ArrayList<>(group.getChildren());
             items.remove(group);
 
-            Inventory inv = CommandStats.createStatsInv(
+            Inventory inv = StatsDisplay.createStatsInv(
                     statsInv.getTitle(),
                     group,
                     items,
@@ -73,7 +77,7 @@ public class EventListener implements Listener {
             );
             player.openInventory(inv);
         } else if(is.equals(statsInv.getNextPageItem())) {
-            Inventory inv = CommandStats.createStatsInv(
+            Inventory inv = StatsDisplay.createStatsInv(
                     statsInv.getTitle(),
                     statsInv.getMainEntry(),
                     statsInv.getItems(),
@@ -83,7 +87,7 @@ public class EventListener implements Listener {
             );
             player.openInventory(inv);
         } else if(is.equals(statsInv.getPrevPageItem())) {
-            Inventory inv = CommandStats.createStatsInv(
+            Inventory inv = StatsDisplay.createStatsInv(
                     statsInv.getTitle(),
                     statsInv.getMainEntry(),
                     statsInv.getItems(),
@@ -96,7 +100,7 @@ public class EventListener implements Listener {
             StatsManager.StatsInventory parent = statsInv.getParent();
             if(parent == null) return;
 
-            Inventory inv = CommandStats.createStatsInv(
+            Inventory inv = StatsDisplay.createStatsInv(
                     parent.getTitle(),
                     parent.getMainEntry(),
                     parent.getItems(),

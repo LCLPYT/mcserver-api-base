@@ -4,13 +4,13 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.serverimpl.bukkit.cmd;
+package work.lclpnet.serverimpl.bukkit.cmd.util;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import work.lclpnet.serverapi.cmd.ICommandScheme;
 
-public abstract class CommandSchemeBase extends CommandBase implements ICommandScheme {
+public abstract class CommandSchemeBase<T> extends CommandBase implements ICommandScheme<T> {
 
     @Override
     public boolean canExecute(CommandSender sender) {

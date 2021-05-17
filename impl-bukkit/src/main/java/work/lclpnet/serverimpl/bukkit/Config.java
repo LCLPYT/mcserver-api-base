@@ -17,6 +17,7 @@ public class Config {
     public static String liveHost = "https://lclpnet.work", stagingHost = "http://localhost:8000";
     public static boolean live = false;
     public static String appName = null;
+    public static boolean debug = false;
 
     private static final File file = new File("plugins/" + MCServerBukkit.PLUGIN_NAME + "/config.yml");
     private static FileConfiguration conf = null;
@@ -44,6 +45,7 @@ public class Config {
         stagingHost = loadValue("network.host-staging", stagingHost);
         live = loadValue("network.use-live", live);
         appName = loadValue("app-name", appName);
+        debug = loadValue("debug", debug);
 
         if(modified) {
             modified = false;

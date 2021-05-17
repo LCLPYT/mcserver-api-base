@@ -4,7 +4,7 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.serverimpl.bukkit.cmd;
+package work.lclpnet.serverimpl.bukkit.cmd.util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

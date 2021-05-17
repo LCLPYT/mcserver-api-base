@@ -11,10 +11,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import work.lclpnet.serverapi.cmd.LanguageCommandScheme;
 import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
+import work.lclpnet.serverimpl.bukkit.cmd.util.PlatformCommandSchemeBase;
 
 import static work.lclpnet.serverimpl.bukkit.util.BukkitServerTranslation.getTranslation;
 
-public class CommandLanguage extends PlatformCommandSchemeBase implements LanguageCommandScheme {
+public class CommandLanguage extends PlatformCommandSchemeBase<Boolean> implements LanguageCommandScheme {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
@@ -25,4 +26,5 @@ public class CommandLanguage extends PlatformCommandSchemeBase implements Langua
         else player.sendMessage(MCServerBukkit.pre + ChatColor.RED
                     + getTranslation(player, "netlang.usage", getCommandName()));
     }
+
 }

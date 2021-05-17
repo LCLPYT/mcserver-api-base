@@ -27,7 +27,8 @@ public class BukkitPlatformBridge implements IPlatformBridge {
     public void sendMessageTo(String playerUuid, MCMessage msg) {
         Player p = Bukkit.getPlayer(UUID.fromString(playerUuid));
         if(p == null) throw new IllegalStateException(String.format("There is no player with UUID '%s' online!", playerUuid));
-        p.sendMessage(BukkitMCMessageImplementation.convertMCMessageToString(msg, p).replaceAll("http://localhost:8000", "https://lclpnet.work"));
+        p.sendMessage(BukkitMCMessageImplementation.convertMCMessageToString(msg, p)
+                .replaceAll("http://localhost:8000", "https://lclpnet.work")); // localhost could lead to problems, even if it is correct for the server host
     }
 
     @Override
