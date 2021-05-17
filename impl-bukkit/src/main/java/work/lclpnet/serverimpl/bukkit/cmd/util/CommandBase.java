@@ -10,16 +10,23 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
 
-public abstract class CommandBase implements CommandExecutor {
+import java.util.List;
+
+public abstract class CommandBase implements CommandExecutor, TabCompleter {
 
     public abstract String getCommandName();
 
     public abstract boolean canExecute(CommandSender sender);
 
     public abstract void execute(CommandSender sender, String[] args);
+
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
+        return null;
+    }
 
     public boolean ensurePlayer(CommandSender sender) {
         if(!(sender instanceof Player)) {
@@ -46,6 +53,17 @@ public abstract class CommandBase implements CommandExecutor {
         }
 
         return false;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+
+        if(command.getName().equalsIgnoreCase(getCommandName())) {
+            if(canExecute(sender)) return getTabCompletions(sender, args);
+            else return null;
+        }
+
+        return null;
     }
 
 }

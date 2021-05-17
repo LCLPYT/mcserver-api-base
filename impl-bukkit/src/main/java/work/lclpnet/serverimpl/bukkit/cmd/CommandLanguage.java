@@ -10,8 +10,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import work.lclpnet.serverapi.cmd.LanguageCommandScheme;
+import work.lclpnet.serverapi.util.ServerCache;
 import work.lclpnet.serverimpl.bukkit.MCServerBukkit;
 import work.lclpnet.serverimpl.bukkit.cmd.util.PlatformCommandSchemeBase;
+
+import java.util.Collections;
+import java.util.List;
 
 import static work.lclpnet.serverimpl.bukkit.util.BukkitServerTranslation.getTranslation;
 
@@ -27,4 +31,9 @@ public class CommandLanguage extends PlatformCommandSchemeBase<Boolean> implemen
                     + getTranslation(player, "netlang.usage", getCommandName()));
     }
 
+    @Override
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
+        if(args.length == 1) return ServerCache.getRegisteredLanguages();
+        else return Collections.emptyList();
+    }
 }

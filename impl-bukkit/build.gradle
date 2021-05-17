@@ -64,7 +64,7 @@ repositories {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
     implementation 'work.lclpnet:lclpnetwork-api:1.2.0'
-    implementation 'work.lclpnet.mcserver-api:mcserver-api-base:0.9.2'
+    implementation 'work.lclpnet.mcserver-api:mcserver-api-base:0.9.3'
     implementation 'work.lclpnet:lclpstorage:1.0.0'
     implementation 'work.lclpnet:translations:1.0.3'
 
