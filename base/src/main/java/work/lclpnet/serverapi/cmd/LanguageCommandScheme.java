@@ -12,8 +12,9 @@ import work.lclpnet.serverapi.util.ImplementationException;
 import work.lclpnet.serverapi.util.ServerCache;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandScheme, IDebuggable {
+public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandScheme<Boolean>, IDebuggable {
 
     @Override
     default String getName() {
@@ -21,12 +22,11 @@ public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandSc
     }
 
     @Override
-    default void execute(String playerUuid, Object[] args) {
+    default CompletableFuture<Boolean> execute(String playerUuid, Object[] args) {
         if(args.length > 1) throw new ImplementationException();
 
         if(args.length <= 0) { // fetch the sender's current language
-            fetchCurrentLang(playerUuid);
-            return;
+            return fetchCurrentLang(playerUuid);
         }
 
         // only string arguments are supported here
@@ -37,21 +37,24 @@ public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandSc
         List<String> registeredLanguages = ServerCache.getRegisteredLanguages();
         if(registeredLanguages == null) {
             getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error.not-editable"));
-            return;
+            return CompletableFuture.completedFuture(false);
         }
 
         if(!registeredLanguages.contains(argument)) {
             getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error.lang-not-registered"));
-            return;
+            return CompletableFuture.completedFuture(false);
         }
 
-        getAPI().setPreferredLanguage(playerUuid, argument)
+        return getAPI().setPreferredLanguage(playerUuid, argument)
                 .exceptionally(ex -> {
                     if(shouldDebug()) logError(ex);
                     return null;
                 })
-                .thenAccept(success -> {
-                    if(success == null || !success) getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error"));
+                .thenApply(success -> {
+                    if(success == null || !success) {
+                        getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error"));
+                        return false;
+                    }
                     else {
                         MCMessage langMsg = MCMessage.blank();
                         if(argument.equals("auto")) langMsg.thenTranslate("netlang.use-client");
@@ -59,21 +62,27 @@ public interface LanguageCommandScheme extends ICommandScheme.IPlatformCommandSc
                         langMsg.setColor(MCMessage.MessageColor.YELLOW);
 
                         getPlatformBridge().sendMessageTo(playerUuid, MCMessage.prefixed().thenTranslate("netlang.updated", langMsg));
-                        ServerCache.refreshPlayer(getAPI(), playerUuid); // load the change
+                        ServerCache.refreshPlayer(getAPI(), playerUuid); // load the change, can be async
+                        return true;
                     }
                 });
     }
 
-    default void fetchCurrentLang(String playerUuid) {
+    default CompletableFuture<Boolean> fetchCurrentLang(String playerUuid) {
         MCPlayer player = ServerCache.getPlayer(playerUuid);
         if(player != null) {
             sendCurrentLang(player);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
 
-        getAPI().getMCPlayerByUUID(playerUuid).thenAccept(pl -> {
-            if(pl == null) getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error"));
-            else sendCurrentLang(pl);
+        return getAPI().getMCPlayerByUUID(playerUuid).thenApply(pl -> {
+            if(pl == null) {
+                getPlatformBridge().sendMessageTo(playerUuid, MCMessage.error().thenTranslate("netlang.error"));
+                return null;
+            } else {
+                sendCurrentLang(pl);
+                return true;
+            }
         });
     }
 

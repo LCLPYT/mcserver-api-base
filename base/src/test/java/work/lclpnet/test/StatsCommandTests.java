@@ -68,44 +68,37 @@ public class StatsCommandTests {
 
     @Test
     void noArgs() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[0]);
-        Thread.sleep(2000L);
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[0]).join();
     }
 
     @Test
     void playerNameMatching() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "LCLP" });
-        Thread.sleep(2000L);
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "LCLP" }).join();
     }
 
     @Test
     void playerName() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "Secuenix" });
-        Thread.sleep(2000L);
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "Secuenix" }).join();
     }
 
     @Test
     void playerUuidMatching() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "7357a549-fa3e-4342-91b2-63e5e73ed39a" });
-        Thread.sleep(2000L);
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "7357a549-fa3e-4342-91b2-63e5e73ed39a" }).join();
     }
 
     @Test
     void playerUuid() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "4eb6bcf7-023f-4b57-b0c3-716a9dbba51f" });
-        Thread.sleep(2000L);
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "4eb6bcf7-023f-4b57-b0c3-716a9dbba51f" }).join();
     }
 
     @Test
     void playerUuidMissing() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "014c30a3-4924-4731-ac59-7a68a5947761" });
-        Thread.sleep(2000L);
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "014c30a3-4924-4731-ac59-7a68a5947761" }).join();
     }
 
     @Test
     void justTrash() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "hfuiahjfaafdhjlkfhjklfdashjfadshjkl7z234" });
-        Thread.sleep(2000L);
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "hfuiahjfaafdhjlkfhjklfdashjfadshjkl7z234" }).join();
     }
 
     @Test

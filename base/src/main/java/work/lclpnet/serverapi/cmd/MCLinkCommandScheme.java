@@ -9,7 +9,9 @@ package work.lclpnet.serverapi.cmd;
 import work.lclpnet.serverapi.translate.MCMessage;
 import work.lclpnet.serverapi.util.IPlatformBridge;
 
-public interface MCLinkCommandScheme extends ICommandScheme.IPlatformCommandScheme, IDebuggable {
+import java.util.concurrent.CompletableFuture;
+
+public interface MCLinkCommandScheme extends ICommandScheme.IPlatformCommandScheme<Boolean>, IDebuggable {
 
     @Override
     default String getName() {
@@ -17,24 +19,26 @@ public interface MCLinkCommandScheme extends ICommandScheme.IPlatformCommandSche
     }
 
     @Override
-    default void execute(String playerUuid, Object[] args) {
+    default CompletableFuture<Boolean> execute(String playerUuid, Object[] args) {
         IPlatformBridge bridge = getPlatformBridge();
 
         bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
                 .thenTranslate("mc-link.requesting"));
 
-        getAPI().requestMCLinkReverseToken(playerUuid)
+        return getAPI().requestMCLinkReverseToken(playerUuid)
                 .exceptionally(ex -> {
                     if(shouldDebug()) logError(ex);
                     return null;
                 })
-                .thenAccept(linkResponse -> {
+                .thenApply(linkResponse -> {
                     if(linkResponse == null) {
                         bridge.sendMessageTo(playerUuid, MCMessage.error()
                                 .thenTranslate("mc-link.error"));
+                        return false;
                     } else if(linkResponse.isAlreadyLinked()) {
                         bridge.sendMessageTo(playerUuid, MCMessage.error()
                                 .thenTranslate("mc-link.already-linked"));
+                        return false;
                     } else {
                         String link = String.format("%s/me/mc-link/%s", getAPI().getAPIAccess().getHost(), linkResponse.getToken());
                         bridge.sendMessageTo(playerUuid, MCMessage.prefixed()
@@ -43,6 +47,7 @@ public interface MCLinkCommandScheme extends ICommandScheme.IPlatformCommandSche
                                         .text(link)
                                         .setColor(MCMessage.MessageColor.YELLOW))
                         );
+                        return true;
                     }
                 });
     }

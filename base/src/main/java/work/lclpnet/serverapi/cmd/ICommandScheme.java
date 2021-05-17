@@ -9,13 +9,15 @@ package work.lclpnet.serverapi.cmd;
 import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverapi.util.IPlatformBridge;
 
-public interface ICommandScheme {
+import java.util.concurrent.CompletableFuture;
+
+public interface ICommandScheme<T> {
 
     String getName();
 
-    void execute(String playerUuid, Object[] args);
+    CompletableFuture<T> execute(String playerUuid, Object[] args);
 
-    interface IPlatformCommandScheme extends ICommandScheme {
+    interface IPlatformCommandScheme<T> extends ICommandScheme<T> {
 
         MCServerAPI getAPI();
 
