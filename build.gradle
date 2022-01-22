@@ -1,34 +1,68 @@
 /*
- * Copyright (c) 2021 LCLP.
+ * Copyright (c) 2022 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-import org.ajoberstar.grgit.Tag
-
 plugins {
-    id 'org.ajoberstar.grgit' version '4.1.0'
+    id 'java-library'
+    id 'maven-publish'
+    id 'gradle-build-utils' version '1.1.0'
 }
 
-def privateProps = new Properties()
-def privatePropsFile = file("private.properties");
-if(privatePropsFile.exists())
-    privatePropsFile.withInputStream { privateProps.load(it) }
+Properties props = loadProperties.call('publish.properties')
 
-ext {
-    /*getHeadId = {
-        return grgit.head().abbreviatedId;
-    }*/
-    getHeadTag = {
-        def headId = grgit.head().id
-        def headTag = null
+group = project.mavenGroup
+archivesBaseName = project.mavenArchivesName
+version = gitVersion.call()
 
-        grgit.tag.list().forEach {
-            def tag = it as Tag
-            if(tag.commit.id == headId) headTag = tag;
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.lclpnet.work/repository/internal' }
+}
+
+dependencies {
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'work.lclpnet:lclpnetwork-api:1.2.0'
+    implementation 'work.lclpnet:translations:1.0.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'mcserver-api-base'
+            from components.java
+
+            pom {
+                name = 'MCServerAPI Base'
+                description = 'A Java library to manage Minecraft server backend interaction with LCLPNetwork.'
+            }
         }
-
-        return headTag
     }
-    PRIVATE = privateProps
+    repositories {
+        maven {
+            if (Arrays.stream("mavenHost", "mavenUser", "mavenPassword").allMatch(props.&containsKey)) {
+                credentials {
+                    username props.getProperty('mavenUser');
+                    password props.getProperty('mavenPassword');
+                }
+                url props.getProperty('mavenHost');
+            } else {
+                url "file:///${project.projectDir}/repo"
+            }
+        }
+    }
 }
