@@ -23,4 +23,4 @@ repo
 # other
 eclipse
 
-base/src/test/resources/test-private.properties
+src/test/resources/test-private.properties
