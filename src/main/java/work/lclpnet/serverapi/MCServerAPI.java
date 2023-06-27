@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -47,11 +47,11 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     @Scopes("minecraft[admin]")
     public CompletableFuture<Boolean> isNetworkOperator(String playerUuid) {
         return api.post("api/mc/admin/is-network-operator", JsonBuilder.object().set("uuid", playerUuid).createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("op");
-            if(elem == null) throw new ResponseEvaluationException(resp);
+            if (elem == null) throw new ResponseEvaluationException(resp);
 
             return elem.getAsBoolean();
         });
@@ -67,31 +67,35 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     @AuthRequired
     @Scopes("minecraft[admin]")
     public CompletableFuture<MCPlayer> updateLastSeen(String playerUuid) {
-        return updateLastSeen(playerUuid, true);
+        return updateLastSeen(playerUuid, null);
     }
 
     /**
      * Updates the last seen property of a {@link MCPlayer}.
      * If there is no MCPlayer with that UUID, it will be created.
      *
-     * @param playerUuid The UUID of the {@link MCPlayer}.
-     * @param doServerCache Whether to cache the player with the given UUID on the server.
+     * @param playerUuid    The UUID of the {@link MCPlayer}.
+     * @param cache An optional {@link ServerCache} instance to cache players to.
      * @return A completable future that will contain the player, or null, if there was an error.
      */
     @AuthRequired
     @Scopes("minecraft[admin]")
-    public CompletableFuture<MCPlayer> updateLastSeen(String playerUuid, boolean doServerCache) {
+    public CompletableFuture<MCPlayer> updateLastSeen(String playerUuid, @Nullable ServerCache cache) {
         return api.post("api/mc/admin/update-last-seen", JsonBuilder.object()
                 .set("uuid", playerUuid)
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("player");
-            if(elem == null) throw new ResponseEvaluationException(resp);
+            if (elem == null) throw new ResponseEvaluationException(resp);
 
             MCPlayer player = MCPlayer.cast(elem, MCPlayer.class);
-            if(doServerCache && player != null) ServerCache.cachePlayer(player);
+
+            if (cache != null && player != null) {
+                cache.cachePlayer(player);
+            }
+
             return player;
         });
     }
@@ -106,18 +110,18 @@ public class MCServerAPI extends LCLPMinecraftAPI {
      * After that, the {@link MCPlayer} can also be associated with a {@link work.lclpnet.lclpnetwork.facade.User}.
      *
      * @param playerUuid The UUID of the minecraft player, with dashes, the integrity of those should be ensured by Minecraft's YggdrasilSessionService.
-     * @param token The MCLinkToken (in form of an UUID, not to confuse with the playerUuid) that a player sent to the minecraft server.
+     * @param token      The MCLinkToken (in form of an UUID, not to confuse with the playerUuid) that a player sent to the minecraft server.
      * @return A completable future that will contain the processing result.
      */
     @AuthRequired
     @Scopes("minecraft[admin]")
     public CompletableFuture<Boolean> processMCLinkToken(String playerUuid, String token) {
         return api.post("api/mc/admin/process-mclink-token", JsonBuilder.object()
-                .set("mcUuid", playerUuid)
-                .set("token", token)
-                .createObject())
+                        .set("mcUuid", playerUuid)
+                        .set("token", token)
+                        .createObject())
                 .thenApply(resp -> {
-                    if(resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
+                    if (resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
                     else return true;
                 });
     }
@@ -136,12 +140,12 @@ public class MCServerAPI extends LCLPMinecraftAPI {
         return api.post("api/mc/admin/request-mclink-reverse-token", JsonBuilder.object()
                 .set("uuid", uuid)
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() == 422 && resp.hasValidationViolations()) {
+            if (resp.getResponseCode() == 422 && resp.hasValidationViolations()) {
                 APIError error = resp.getValidationViolations();
-                if(error.has("uuid", "The uuid has already been taken."))
+                if (error.has("uuid", "The uuid has already been taken."))
                     return new MCLinkResponse(true, null);
             }
-            if(resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("token");
@@ -154,7 +158,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     /**
      * Gives a certain amount of coins to the {@link MCPlayer} with the given UUID.
      *
-     * @param statType The type of stat to increment. E.g. 'currency'.
+     * @param statType     The type of stat to increment. E.g. 'currency'.
      * @param transactions A list of increment transactions to send.
      * @return A completable future that will contain the {@link IncrementResult}.
      */
@@ -165,7 +169,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("statType", statType)
                 .beginArray("transactions").addAll(transactions).endArray()
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
             else return resp.getResponseAs(IncrementResult.class);
         });
     }
@@ -191,7 +195,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     @Scopes("minecraft[admin]")
     public CompletableFuture<List<String>> getRegisteredLanguages() {
         return api.get("api/mc/admin/get-registered-languages").thenApply(resp -> {
-            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonArray arr = resp.getResponseAs(JsonArray.class);
             List<String> languages = new ArrayList<>();
@@ -216,7 +220,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("lang", lang)
                 .createObject()
         ).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
             else return true;
         });
     }
@@ -225,7 +229,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
      * Gets a list of players ranked by a property with the given size.
      *
      * @param property The property to rank the players by.
-     * @param amount The size of the returned list.
+     * @param amount   The size of the returned list.
      * @return A completable future that will contain the fetched ranked list of players.
      */
     @AuthRequired
@@ -235,7 +239,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("property", property)
                 .set("amount", amount)
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
 
             JsonArray arr = resp.getResponseAs(JsonArray.class);
             List<MCPlayer> players = new ArrayList<>();
@@ -249,10 +253,10 @@ public class MCServerAPI extends LCLPMinecraftAPI {
      * Creates a coin transaction that will consume a given amount of coins by a given payer.
      * If the recipient is set, the recipient will receive the coins.
      *
-     * @param payerUuid The UUID of the player who pays the coins.
-     * @param recipientUuid The optional UUID of the player who receives the coins. If null, the coins will be payed to the server.
-     * @param amount The amount of coins involved in this transaction.
-     * @param itemName The title of the transaction. Can be a translation key, if the "itemNameTranslated" param is set to true.
+     * @param payerUuid          The UUID of the player who pays the coins.
+     * @param recipientUuid      The optional UUID of the player who receives the coins. If null, the coins will be payed to the server.
+     * @param amount             The amount of coins involved in this transaction.
+     * @param itemName           The title of the transaction. Can be a translation key, if the "itemNameTranslated" param is set to true.
      * @param itemNameTranslated Whether the "itemName" is a translation key.
      * @return A completable future that will contain the {@link TransactionResult}.
      */
@@ -265,10 +269,11 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("item_name", itemName)
                 .set("is_name_translated", itemNameTranslated);
 
-        if(recipientUuid != null) builder.set("recipient_uuid", recipientUuid);
+        if (recipientUuid != null) builder.set("recipient_uuid", recipientUuid);
 
         return api.post("api/mc/admin/make-coin-transaction", builder.createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200 && resp.getResponseCode() != 201) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200 && resp.getResponseCode() != 201)
+                throw new ResponseEvaluationException(resp);
             else return resp.getResponseAs(TransactionResult.class);
         });
     }
@@ -276,7 +281,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
     /**
      * Updates the last played property of a given game for given players.
      *
-     * @param statType The game that should be updated.
+     * @param statType    The game that should be updated.
      * @param playerUuids A list of players that should be updated.
      * @return A completable future that will contain a {@link MassUpdateResult}.
      */
@@ -287,7 +292,7 @@ public class MCServerAPI extends LCLPMinecraftAPI {
                 .set("statType", statType)
                 .beginArray("players").addAll(playerUuids).endArray()
                 .createObject()).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
+            if (resp.getResponseCode() != 200) throw new ResponseEvaluationException(resp);
             else return resp.getResponseAs(MassUpdateResult.class);
         });
     }

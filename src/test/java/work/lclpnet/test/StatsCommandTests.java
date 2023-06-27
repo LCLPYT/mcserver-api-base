@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -13,9 +13,7 @@ import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverapi.cmd.StatsCommandScheme;
 import work.lclpnet.serverapi.translate.MCMessage;
 import work.lclpnet.serverapi.translate.RawMCMessageImplementation;
-import work.lclpnet.serverapi.util.IPlatformBridge;
-import work.lclpnet.serverapi.util.MojangAPI;
-import work.lclpnet.serverapi.util.TransactionMessenger;
+import work.lclpnet.serverapi.util.*;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -40,14 +38,23 @@ public class StatsCommandTests {
 
     };
 
+    private static final ServerContext testServerContext = new ServerContext() {
+        private final ServerCache cache = new ServerCache();
+
+        @Override
+        public ServerCache getCache() {
+            return cache;
+        }
+    };
+
     private static final StatsCommandScheme testStatsCommand = new StatsCommandScheme() {
+
+        private final MCServerAPI api = new MCServerAPI(APIAccess.PUBLIC);
 
         @Override
         public boolean shouldDebug() {
             return true;
         }
-
-        private final MCServerAPI api = new MCServerAPI(APIAccess.PUBLIC);
 
         @Override
         public MCServerAPI getAPI() {
@@ -64,47 +71,51 @@ public class StatsCommandTests {
             System.out.println("Success: " + RawMCMessageImplementation.convertMCMessageToString(title, "en_us") + " " + targetStats);
         }
 
+        @Override
+        public ServerContext getContext() {
+            return testServerContext;
+        }
     };
 
     @Test
-    void noArgs() throws InterruptedException {
+    void noArgs() {
         testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[0]).join();
     }
 
     @Test
-    void playerNameMatching() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "LCLP" }).join();
+    void playerNameMatching() {
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[]{"LCLP"}).join();
     }
 
     @Test
-    void playerName() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "Secuenix" }).join();
+    void playerName() {
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[]{"Secuenix"}).join();
     }
 
     @Test
-    void playerUuidMatching() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "7357a549-fa3e-4342-91b2-63e5e73ed39a" }).join();
+    void playerUuidMatching() {
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[]{"7357a549-fa3e-4342-91b2-63e5e73ed39a"}).join();
     }
 
     @Test
-    void playerUuid() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "4eb6bcf7-023f-4b57-b0c3-716a9dbba51f" }).join();
+    void playerUuid() {
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[]{"4eb6bcf7-023f-4b57-b0c3-716a9dbba51f"}).join();
     }
 
     @Test
-    void playerUuidMissing() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "014c30a3-4924-4731-ac59-7a68a5947761" }).join();
+    void playerUuidMissing() {
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[]{"014c30a3-4924-4731-ac59-7a68a5947761"}).join();
     }
 
     @Test
-    void justTrash() throws InterruptedException {
-        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[] { "hfuiahjfaafdhjlkfhjklfdashjfadshjkl7z234" }).join();
+    void justTrash() {
+        testStatsCommand.execute("7357a549-fa3e-4342-91b2-63e5e73ed39a", new Object[]{"hfuiahjfaafdhjlkfhjklfdashjfadshjkl7z234"}).join();
     }
 
     @Test
     void transactionMessenger() {
-        TransactionMessenger.sendStatChangeMessage(testBridge, "7357a549-fa3e-4342-91b2-63e5e73ed39a", "stat.general.coins", 5);
-        TransactionMessenger.sendStatChangeMessage(testBridge, "7357a549-fa3e-4342-91b2-63e5e73ed39a", "stat.general.coins", -2);
+        TransactionMessenger messenger = TransactionMessenger.getInstance();
+        messenger.sendStatChangeMessage(testBridge, "7357a549-fa3e-4342-91b2-63e5e73ed39a", "stat.general.coins", 5);
+        messenger.sendStatChangeMessage(testBridge, "7357a549-fa3e-4342-91b2-63e5e73ed39a", "stat.general.coins", -2);
     }
-
 }

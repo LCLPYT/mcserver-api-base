@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -8,6 +8,7 @@ package work.lclpnet.serverapi.cmd;
 
 import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverapi.util.IPlatformBridge;
+import work.lclpnet.serverapi.util.ServerContext;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,6 +24,6 @@ public interface ICommandScheme<T> {
 
         IPlatformBridge getPlatformBridge();
 
+        ServerContext getContext();
     }
-
 }

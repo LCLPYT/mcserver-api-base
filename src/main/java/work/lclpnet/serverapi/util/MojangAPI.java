@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -29,11 +29,11 @@ public class MojangAPI {
     public static CompletableFuture<String> getUUIDByUsername(String username) {
         return CompletableFuture.supplyAsync(() -> sendHttpGetSync(String.format("https://api.mojang.com/users/profiles/minecraft/%s", username)
         )).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) return null;
+            if (resp.getResponseCode() != 200) return null;
 
             JsonObject obj = resp.getResponseAs(JsonObject.class);
             JsonElement elem = obj.get("id");
-            if(elem == null) return null;
+            if (elem == null) return null;
             else {
                 String id = elem.getAsString();
                 StringBuilder builder = new StringBuilder(id.trim());
@@ -58,7 +58,7 @@ public class MojangAPI {
                         String.format("https://api.mojang.com/user/profiles/%s/names", uuid.replaceAll("-", ""))
                 )
         ).thenApply(resp -> {
-            if(resp.getResponseCode() != 200) return null;
+            if (resp.getResponseCode() != 200) return null;
 
             JsonArray arr = resp.getResponseAs(JsonArray.class);
 
@@ -66,17 +66,17 @@ public class MojangAPI {
             long latest = 0;
 
             for (JsonElement elem : arr) {
-                if(!elem.isJsonObject()) continue;
+                if (!elem.isJsonObject()) continue;
 
                 JsonObject obj = elem.getAsJsonObject();
                 JsonElement changedToAt = obj.get("changedToAt");
                 long time = changedToAt == null ? 0 : changedToAt.getAsLong();
 
-                if(time < latest) continue;
+                if (time < latest) continue;
 
                 latest = time;
                 JsonElement name = obj.get("name");
-                if(name != null) latestName = name.getAsString();
+                if (name != null) latestName = name.getAsString();
             }
 
             return latestName;

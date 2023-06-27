@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -23,31 +23,36 @@ public class RawMCMessageImplementation {
     public static String convertMCMessageToString(MCMessage msg, String language, ITranslationService translationService) {
         StringBuilder builder = new StringBuilder();
         recurseMessage(Objects.requireNonNull(msg), language, builder, translationService);
+
         return builder.toString();
     }
 
     private static void recurseMessage(MCMessage msg, String language, StringBuilder builder, ITranslationService translationService) {
-        if(msg.isTextNode()) {
-            String text;
-            if(msg instanceof MCMessage.MCTranslationMessage) {
-                MCMessage.MCTranslationMessage translationMsg = (MCMessage.MCTranslationMessage) msg;
-
-                List<MCMessage> substituteList = translationMsg.getSubstitutes();
-                String[] substitutes = new String[substituteList.size()];
-                for (int i = 0; i < substituteList.size(); i++) {
-                    MCMessage subMsg = substituteList.get(i);
-                    substitutes[i] = convertMCMessageToString(subMsg, language);
-                }
-
-                text = translationService.translate(language, translationMsg.getText(), substitutes);
-            } else {
-                text = msg.getText();
+        if (!msg.isTextNode()) {
+            for (MCMessage child : msg.getChildren()) {
+                recurseMessage(child, language, builder, translationService);
             }
 
-            builder.append(text);
-        } else {
-            msg.getChildren().forEach(child -> recurseMessage(child, language, builder, translationService));
+            return;
         }
-    }
 
+        String text;
+        if (msg instanceof MCMessage.MCTranslationMessage) {
+            MCMessage.MCTranslationMessage translationMsg = (MCMessage.MCTranslationMessage) msg;
+
+            List<MCMessage> substituteList = translationMsg.getSubstitutes();
+            String[] substitutes = new String[substituteList.size()];
+
+            for (int i = 0; i < substituteList.size(); i++) {
+                MCMessage subMsg = substituteList.get(i);
+                substitutes[i] = convertMCMessageToString(subMsg, language);
+            }
+
+            text = translationService.translate(language, translationMsg.getText(), substitutes);
+        } else {
+            text = msg.getText();
+        }
+
+        builder.append(text);
+    }
 }

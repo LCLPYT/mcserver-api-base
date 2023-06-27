@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -20,44 +20,44 @@ import java.util.concurrent.CompletableFuture;
 
 public class ServerCache {
 
-    private static final Map<String, MCPlayer> playersByUuid = new HashMap<>();
-    private static final List<String> registeredLanguages = new ArrayList<>();
+    private final Map<String, MCPlayer> playersByUuid = new HashMap<>();
+    private final List<String> registeredLanguages = new ArrayList<>();
 
-    public static void cachePlayer(MCPlayer player) {
+    public void cachePlayer(MCPlayer player) {
         Objects.requireNonNull(player);
         playersByUuid.put(player.getUuid(), player);
     }
 
-    public static void removeCachedPlayer(String uuid) {
+    public void removeCachedPlayer(String uuid) {
         Objects.requireNonNull(uuid);
         playersByUuid.remove(uuid);
     }
 
     @Nullable
-    public static MCPlayer getPlayer(String uuid) {
+    public MCPlayer getPlayer(String uuid) {
         Objects.requireNonNull(uuid);
         return playersByUuid.get(uuid);
     }
 
-    public static List<String> getRegisteredLanguages() {
+    public List<String> getRegisteredLanguages() {
         return registeredLanguages;
     }
 
-    public static CompletableFuture<Void> refreshRegisteredLanguages(MCServerAPI api) {
+    public CompletableFuture<Void> refreshRegisteredLanguages(MCServerAPI api) {
         return api.getRegisteredLanguages().thenAccept(languages -> {
             registeredLanguages.clear();
-            if(languages != null) registeredLanguages.addAll(languages);
+            if (languages != null) registeredLanguages.addAll(languages);
         });
     }
 
-    public static CompletableFuture<Void> reloadTranslations(LCLPTranslationAPI api, @Nullable ILogger logger) throws IOException {
+    public CompletableFuture<Void> reloadTranslations(LCLPTranslationAPI api, @Nullable ILogger logger) throws IOException {
         LCLPNetworkTranslationLoader loader = new LCLPNetworkTranslationLoader(Collections.singletonList("mc_server"), null, api, logger);
         return Translations.loadAsyncFrom(loader);
     }
 
-    public static CompletableFuture<Void> refreshPlayer(MCServerAPI api, String uuid) {
+    public CompletableFuture<Void> refreshPlayer(MCServerAPI api, String uuid) {
         return api.getMCPlayerByUUID(uuid).thenAccept(player -> {
-            if(player != null) cachePlayer(player);
+            if (player != null) cachePlayer(player);
         });
     }
 
@@ -67,22 +67,22 @@ public class ServerCache {
      * Initializes the {@link ServerCache}.
      * Implementations should call this method on their initialization.
      *
-     * @param api A {@link MCServerAPI} instance to use for fetching data.
+     * @param api    A {@link MCServerAPI} instance to use for fetching data.
      * @param logger An optional logger to receive information.
-     * @throws IOException If there was an I/O-error in the initialization process.
+     * @throws IOException If there was an IO-error in the initialization process.
      */
-    public static void init(MCServerAPI api, @Nullable ILogger logger) throws IOException {
-        refreshRegisteredLanguages(api).thenAccept(ignored -> {}); // language refresh can run async
+    public void init(MCServerAPI api, @Nullable ILogger logger) throws IOException {
+        refreshRegisteredLanguages(api); // language refresh can run async
         reloadTranslations(new LCLPTranslationAPI(api.getAPIAccess()), logger).join(); // should run synchronous
     }
 
     /**
      * Removes all cache items for the given player UUID.
      * Implementations should call this, if a player leaves the server.
+     *
      * @param uuid The player UUID.
      */
-    public static void dropAllCachesFor(String uuid) {
+    public void dropAllCachesFor(String uuid) {
         removeCachedPlayer(uuid);
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -33,19 +33,30 @@ public class MassIncrementTransaction {
 
         Optional<IncrementTransaction> existing = getTransactionFor(uuid);
         IncrementTransaction transaction;
-        if(!existing.isPresent()) {
+
+        if (!existing.isPresent()) {
             transaction = new IncrementTransaction(uuid, new ArrayList<>());
             transactions.add(transaction);
-        } else transaction = existing.get();
+        } else {
+            transaction = existing.get();
+        }
 
         Optional<IncrementTransaction.Item> existingItem = transaction.getItemFor(type);
-        if(!existingItem.isPresent()) {
+        if (!existingItem.isPresent()) {
             IncrementTransaction.Item item = new IncrementTransaction.Item(type, amount);
-            if(extra != null) extra.forEach(item::setExtraProperty);
+
+            if (extra != null) {
+                extra.forEach(item::setExtraProperty);
+            }
+
             transaction.addItem(item);
         } else {
             IncrementTransaction.Item item = existingItem.get();
-            if(extra != null) extra.forEach(item::setExtraProperty);
+
+            if (extra != null) {
+                extra.forEach(item::setExtraProperty);
+            }
+
             item.setAmount(item.getAmount() + amount);
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -40,7 +40,7 @@ public interface IPlatformBridge {
      * Fetches a {@link MCPlayer} by their current username.
      *
      * @param name The player's username.
-     * @param api An API instance to use.
+     * @param api  An API instance to use.
      * @return A completable future that will receive the fetched MCPlayer.
      */
     default CompletableFuture<MCPlayer> getPlayerByName(String name, MCServerAPI api) {

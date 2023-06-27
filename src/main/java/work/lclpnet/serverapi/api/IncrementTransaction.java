@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -51,11 +51,7 @@ public class IncrementTransaction extends JsonSerializable {
 
         public Item(String type, int amount) {
             this.type = Objects.requireNonNull(type);
-            if(amount <= 0) throw new IllegalArgumentException("The amount must be greater than 0!");
-            this.amount = amount;
-        }
-
-        public void setAmount(int amount) {
+            if (amount <= 0) throw new IllegalArgumentException("The amount must be greater than 0!");
             this.amount = amount;
         }
 
@@ -65,6 +61,10 @@ public class IncrementTransaction extends JsonSerializable {
 
         public int getAmount() {
             return amount;
+        }
+
+        public void setAmount(int amount) {
+            this.amount = amount;
         }
 
         public Map<String, Object> getExtra() {
@@ -78,10 +78,12 @@ public class IncrementTransaction extends JsonSerializable {
         public void setExtraProperty(String key, Object value) {
             Objects.requireNonNull(key);
             Objects.requireNonNull(value);
-            if(getExtra() == null) setExtra(new HashMap<>());
+
+            if (getExtra() == null) {
+                setExtra(new HashMap<>());
+            }
+
             this.extra.put(key, value);
         }
-
     }
-
 }

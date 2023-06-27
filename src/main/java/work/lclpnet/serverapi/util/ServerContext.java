@@ -4,12 +4,9 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.serverapi.api;
+package work.lclpnet.serverapi.util;
 
-public class StatTypes {
+public interface ServerContext {
 
-    public static final String CURRENCY = "currency";
-
-    private StatTypes() {
-    }
+    ServerCache getCache();
 }

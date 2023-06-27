@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
@@ -27,32 +27,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MCServerTests {
 
-    @Test
-    void isNetworkOperatorNoAuth() {
-        MCServerAPI instance = new MCServerAPI(APIAccess.PUBLIC);
-        try {
-            instance.isNetworkOperator("7357a549-fa3e-4342-91b2-63e5e73ed39a").thenAccept(System.out::println).join();
-            fail("This statement should not be reached.");
-        } catch (CompletionException e) {
-            if(e.getCause() == null || !(e.getCause() instanceof APIException)) throw e;
-            assertEquals(APIException.UNAUTHENTICATED, e.getCause());
-        }
+    @Nullable
+    static MCServerAPI localAuth() throws IOException {
+        return getAuth("localToken", "http://localhost:8000");
     }
 
-    @Test
-    void isNetworkOperator() throws IOException {
-        MCServerAPI instance = stagingAuth();
-        assertNotNull(instance);
-
-        Boolean operator = instance.isNetworkOperator("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
-        assertTrue(operator);
+    @Nullable
+    static MCServerAPI stagingAuth() throws IOException {
+        return getAuth("stagingToken", "https://staging.lclpnet.work");
     }
 
-    @Test
-    void updateLastSeen() throws IOException {
-        MCServerAPI instance = stagingAuth();
-        assertNotNull(instance);
-        instance.updateLastSeen("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
+    @Nullable
+    static MCServerAPI getAuth(String tokenKey, String host) throws IOException {
+        return getAuth(tokenKey, host, MCServerAPI::new);
     }
 
     /*@Test
@@ -72,6 +59,62 @@ public class MCServerTests {
         assertFalse(linkResponse.isAlreadyLinked());
         assertNotNull(linkResponse.getToken());
     }*/
+
+    @Nullable
+    static <T extends LCLPNetworkAPI> T getAuth(String tokenKey, String host, Function<APIAuthAccess, T> mapper) throws IOException {
+        String token = getPrivateProperty(tokenKey);
+        if (token == null) return null;
+
+        CompletableFuture<APIAuthAccess> future;
+        if (host == null) future = APIAccess.withAuth(token);
+        else {
+            APIAuthAccess access = new APIAuthAccess(token);
+            access.setHost(host);
+            future = APIAccess.withAuthCheck(access);
+        }
+
+        return future.thenApply(mapper).join();
+    }
+
+    @Nullable
+    static String getPrivateProperty(String key) throws IOException {
+        File f = new File("src/test/resources/test-private.properties");
+        Properties privateProps = new Properties();
+        try (InputStream in = new FileInputStream(f)) {
+            privateProps.load(in);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+        return privateProps.getProperty(key);
+    }
+
+    @Test
+    void isNetworkOperatorNoAuth() {
+        MCServerAPI instance = new MCServerAPI(APIAccess.PUBLIC);
+        try {
+            instance.isNetworkOperator("7357a549-fa3e-4342-91b2-63e5e73ed39a").thenAccept(System.out::println).join();
+            fail("This statement should not be reached.");
+        } catch (CompletionException e) {
+            if (e.getCause() == null || !(e.getCause() instanceof APIException)) throw e;
+            assertEquals(APIException.UNAUTHENTICATED, e.getCause());
+        }
+    }
+
+    @Test
+    void isNetworkOperator() throws IOException {
+        MCServerAPI instance = stagingAuth();
+        assertNotNull(instance);
+
+        Boolean operator = instance.isNetworkOperator("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
+        assertTrue(operator);
+    }
+
+    @Test
+    void updateLastSeen() throws IOException {
+        MCServerAPI instance = stagingAuth();
+        assertNotNull(instance);
+        instance.updateLastSeen("7357a549-fa3e-4342-91b2-63e5e73ed39a").join();
+    }
 
     @Test
     void incrementStat() throws IOException {
@@ -126,6 +169,8 @@ public class MCServerTests {
         assertTrue(result.isSuccess());
     }
 
+    /* */
+
     @Test
     void getRegisteredLanguages() throws IOException {
         MCServerAPI instance = stagingAuth();
@@ -174,51 +219,6 @@ public class MCServerTests {
                 "4eb6bcf7-023f-4b57-b0c3-716a9dbba51f"
         )).join();
         assertTrue(result.isSuccess());
-    }
-
-    /* */
-
-    @Nullable
-    static MCServerAPI localAuth() throws IOException {
-        return getAuth("localToken", "http://localhost:8000");
-    }
-
-    @Nullable
-    static MCServerAPI stagingAuth() throws IOException {
-        return getAuth("stagingToken", "https://staging.lclpnet.work");
-    }
-
-    @Nullable
-    static MCServerAPI getAuth(String tokenKey, String host) throws IOException {
-        return getAuth(tokenKey, host, MCServerAPI::new);
-    }
-
-    @Nullable
-    static <T extends LCLPNetworkAPI > T getAuth(String tokenKey, String host, Function<APIAuthAccess, T> mapper) throws IOException {
-        String token = getPrivateProperty(tokenKey);
-        if (token == null) return null;
-
-        CompletableFuture<APIAuthAccess> future;
-        if (host == null) future = APIAccess.withAuth(token);
-        else {
-            APIAuthAccess access = new APIAuthAccess(token);
-            access.setHost(host);
-            future = APIAccess.withAuthCheck(access);
-        }
-
-        return future.thenApply(mapper).join();
-    }
-
-    @Nullable
-    static String getPrivateProperty(String key) throws IOException {
-        File f = new File("src/test/resources/test-private.properties");
-        Properties privateProps = new Properties();
-        try (InputStream in = new FileInputStream(f)) {
-            privateProps.load(in);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
-        return privateProps.getProperty(key);
     }
 
 }
