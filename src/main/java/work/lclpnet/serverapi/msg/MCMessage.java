@@ -80,6 +80,7 @@ public class MCMessage {
     }
 
     /**
+     * @param prefix The prefix.
      * @param prefixColor The color of the prefix.
      * @return A new prefixed message.
      */
