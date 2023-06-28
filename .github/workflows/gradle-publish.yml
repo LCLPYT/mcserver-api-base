@@ -8,8 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # required to create a release on the repository
     steps:
       - uses: actions/checkout@v3
 
