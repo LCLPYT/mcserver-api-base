@@ -4,14 +4,14 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.test;
+package work.lclpnet.serverapi;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIf;
 import work.lclpnet.lclpnetwork.LCLPNetworkAPI;
 import work.lclpnet.lclpnetwork.api.*;
-import work.lclpnet.serverapi.MCServerAPI;
 import work.lclpnet.serverapi.api.*;
 
 import javax.annotation.Nullable;
@@ -25,6 +25,7 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisabledIf("work.lclpnet.serverapi.MCServerTests#isDisabled")
 public class MCServerTests {
 
     @Nullable
@@ -221,4 +222,11 @@ public class MCServerTests {
         assertTrue(result.isSuccess());
     }
 
+    private static boolean isDisabled() {
+        try {
+            return localAuth() == null || stagingAuth() == null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

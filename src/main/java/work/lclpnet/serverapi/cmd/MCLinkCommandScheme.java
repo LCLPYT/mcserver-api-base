@@ -6,7 +6,7 @@
 
 package work.lclpnet.serverapi.cmd;
 
-import work.lclpnet.serverapi.translate.MCMessage;
+import work.lclpnet.serverapi.msg.MCMessage;
 import work.lclpnet.serverapi.util.IPlatformBridge;
 
 import java.util.concurrent.CompletableFuture;

@@ -6,7 +6,7 @@
 
 package work.lclpnet.serverapi.util;
 
-import work.lclpnet.serverapi.translate.MCMessage;
+import work.lclpnet.serverapi.msg.MCMessage;
 
 import java.util.Objects;
 

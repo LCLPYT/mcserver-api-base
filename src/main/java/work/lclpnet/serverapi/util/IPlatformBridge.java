@@ -8,7 +8,7 @@ package work.lclpnet.serverapi.util;
 
 import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.serverapi.MCServerAPI;
-import work.lclpnet.serverapi.translate.MCMessage;
+import work.lclpnet.serverapi.msg.MCMessage;
 
 import java.util.concurrent.CompletableFuture;
 

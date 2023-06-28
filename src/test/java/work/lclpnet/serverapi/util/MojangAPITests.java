@@ -1,13 +1,12 @@
 /*
- * Copyright (c) 2022 LCLP.
+ * Copyright (c) 2023 LCLP.
  *
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.test;
+package work.lclpnet.serverapi.util;
 
 import org.junit.jupiter.api.Test;
-import work.lclpnet.serverapi.util.MojangAPI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

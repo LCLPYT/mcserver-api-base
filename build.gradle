@@ -7,25 +7,28 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'gradle-build-utils' version '1.1.0'
+    id 'gradle-build-utils' version '1.5.3'
 }
 
-Properties props = loadProperties.call('publish.properties')
+Properties props = buildUtils.loadProperties('publish.properties')
 
 group = project.mavenGroup
 archivesBaseName = project.mavenArchivesName
-version = gitVersion.call()
+version = buildUtils.gitVersion()
 
 repositories {
     mavenCentral()
-    maven { url = 'https://repo.lclpnet.work/repository/internal' }
+    maven {
+        url = 'https://repo.lclpnet.work/repository/internal'
+    }
 }
 
 dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'work.lclpnet:lclpnetwork-api:1.2.0'
-    implementation 'work.lclpnet:translations:1.0.3'
+    implementation 'work.lclpnet:translations4j:2.2.0'
+    implementation 'org.slf4j:slf4j-api:2.0.6'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
@@ -44,7 +47,10 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId = 'mcserver-api-base'
-            from components.java
+
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
 
             pom {
                 name = 'MCServerAPI Base'

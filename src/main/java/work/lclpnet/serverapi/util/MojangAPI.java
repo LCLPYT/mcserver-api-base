@@ -6,7 +6,6 @@
 
 package work.lclpnet.serverapi.util;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import work.lclpnet.lclpnetwork.api.APIException;
@@ -53,33 +52,15 @@ public class MojangAPI {
      * @return A completable future which will receive the fetched username.
      */
     public static CompletableFuture<String> getUsernameByUUID(String uuid) {
-        return CompletableFuture.supplyAsync(
-                () -> sendHttpGetSync(
-                        String.format("https://api.mojang.com/user/profiles/%s/names", uuid.replaceAll("-", ""))
-                )
+        return CompletableFuture.supplyAsync(() -> sendHttpGetSync(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s",
+                uuid.replaceAll("-", "")))
         ).thenApply(resp -> {
             if (resp.getResponseCode() != 200) return null;
 
-            JsonArray arr = resp.getResponseAs(JsonArray.class);
+            JsonObject obj = resp.getResponseAs(JsonObject.class);
+            if (!obj.has("name")) return null;
 
-            String latestName = null;
-            long latest = 0;
-
-            for (JsonElement elem : arr) {
-                if (!elem.isJsonObject()) continue;
-
-                JsonObject obj = elem.getAsJsonObject();
-                JsonElement changedToAt = obj.get("changedToAt");
-                long time = changedToAt == null ? 0 : changedToAt.getAsLong();
-
-                if (time < latest) continue;
-
-                latest = time;
-                JsonElement name = obj.get("name");
-                if (name != null) latestName = name.getAsString();
-            }
-
-            return latestName;
+            return obj.get("name").getAsString();
         });
     }
 

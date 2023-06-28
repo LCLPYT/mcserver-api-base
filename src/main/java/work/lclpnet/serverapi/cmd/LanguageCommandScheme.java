@@ -7,7 +7,7 @@
 package work.lclpnet.serverapi.cmd;
 
 import work.lclpnet.lclpnetwork.facade.MCPlayer;
-import work.lclpnet.serverapi.translate.MCMessage;
+import work.lclpnet.serverapi.msg.MCMessage;
 import work.lclpnet.serverapi.util.ImplementationException;
 import work.lclpnet.serverapi.util.ServerCache;
 

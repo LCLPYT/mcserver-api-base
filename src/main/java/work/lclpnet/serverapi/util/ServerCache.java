@@ -8,13 +8,8 @@ package work.lclpnet.serverapi.util;
 
 import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.serverapi.MCServerAPI;
-import work.lclpnet.translations.Translations;
-import work.lclpnet.translations.network.LCLPNetworkTranslationLoader;
-import work.lclpnet.translations.network.LCLPTranslationAPI;
-import work.lclpnet.translations.util.ILogger;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,13 +41,11 @@ public class ServerCache {
     public CompletableFuture<Void> refreshRegisteredLanguages(MCServerAPI api) {
         return api.getRegisteredLanguages().thenAccept(languages -> {
             registeredLanguages.clear();
-            if (languages != null) registeredLanguages.addAll(languages);
-        });
-    }
 
-    public CompletableFuture<Void> reloadTranslations(LCLPTranslationAPI api, @Nullable ILogger logger) throws IOException {
-        LCLPNetworkTranslationLoader loader = new LCLPNetworkTranslationLoader(Collections.singletonList("mc_server"), null, api, logger);
-        return Translations.loadAsyncFrom(loader);
+            if (languages != null) {
+                registeredLanguages.addAll(languages);
+            }
+        });
     }
 
     public CompletableFuture<Void> refreshPlayer(MCServerAPI api, String uuid) {
@@ -68,12 +61,9 @@ public class ServerCache {
      * Implementations should call this method on their initialization.
      *
      * @param api    A {@link MCServerAPI} instance to use for fetching data.
-     * @param logger An optional logger to receive information.
-     * @throws IOException If there was an IO-error in the initialization process.
      */
-    public void init(MCServerAPI api, @Nullable ILogger logger) throws IOException {
-        refreshRegisteredLanguages(api); // language refresh can run async
-        reloadTranslations(new LCLPTranslationAPI(api.getAPIAccess()), logger).join(); // should run synchronous
+    public void init(MCServerAPI api) {
+        refreshRegisteredLanguages(api);  // language refresh can run async
     }
 
     /**

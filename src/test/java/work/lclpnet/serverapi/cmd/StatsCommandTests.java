@@ -4,15 +4,14 @@
  * Licensed under the MIT License. For more information, consider the LICENSE file in the project's root directory.
  */
 
-package work.lclpnet.test;
+package work.lclpnet.serverapi.cmd;
 
 import org.junit.jupiter.api.Test;
 import work.lclpnet.lclpnetwork.api.APIAccess;
 import work.lclpnet.lclpnetwork.facade.MCStats;
 import work.lclpnet.serverapi.MCServerAPI;
-import work.lclpnet.serverapi.cmd.StatsCommandScheme;
-import work.lclpnet.serverapi.translate.MCMessage;
-import work.lclpnet.serverapi.translate.RawMCMessageImplementation;
+import work.lclpnet.serverapi.msg.MCMessage;
+import work.lclpnet.serverapi.msg.RawMCMessageImplementation;
 import work.lclpnet.serverapi.util.*;
 
 import java.util.concurrent.CompletableFuture;
