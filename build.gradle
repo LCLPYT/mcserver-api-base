@@ -44,6 +44,8 @@ java {
 }
 
 publishing {
+    buildUtils.setupPublishRepository(repositories, props)
+
     publications {
         mavenJava(MavenPublication) {
             artifactId = 'mcserver-api-base'
@@ -55,19 +57,6 @@ publishing {
             pom {
                 name = 'MCServerAPI Base'
                 description = 'A Java library to manage Minecraft server backend interaction with LCLPNetwork.'
-            }
-        }
-    }
-    repositories {
-        maven {
-            if (Arrays.stream("mavenHost", "mavenUser", "mavenPassword").allMatch(props.&containsKey)) {
-                credentials {
-                    username props.getProperty('mavenUser');
-                    password props.getProperty('mavenPassword');
-                }
-                url props.getProperty('mavenHost');
-            } else {
-                url "file:///${project.projectDir}/repo"
             }
         }
     }
