@@ -43,6 +43,12 @@ java {
     withSourcesJar()
 }
 
+[jar, sourcesJar, javadocJar].each {
+    it.from(rootProject.file('LICENSE')) {
+        rename { "${it}_${project.archives_base_name}"}
+    }
+}
+
 publishing {
     buildUtils.setupPublishRepository(repositories, props)
 
