@@ -10,7 +10,7 @@ import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.serverapi.util.ServerCache;
 import work.lclpnet.translations.DefaultLanguageTranslator;
 import work.lclpnet.translations.Translator;
-import work.lclpnet.translations.loader.translation.SPITranslationLoader;
+import work.lclpnet.translations.loader.translation.TranslationLoader;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
@@ -20,13 +20,9 @@ public class ServerTranslations {
     private final ServerCache cache;
     private final DefaultLanguageTranslator translator;
 
-    public ServerTranslations(ServerCache cache) {
+    public ServerTranslations(ServerCache cache, TranslationLoader translationLoader) {
         this.cache = cache;
-
-        ClassLoader classLoader = getClass().getClassLoader();
-        SPITranslationLoader loader = new SPITranslationLoader(classLoader);
-
-        this.translator = new DefaultLanguageTranslator(loader);
+        this.translator = new DefaultLanguageTranslator(translationLoader);
     }
 
     @Nullable
