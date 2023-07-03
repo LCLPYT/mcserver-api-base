@@ -8,6 +8,7 @@ package work.lclpnet.serverapi.msg;
 
 import work.lclpnet.serverapi.util.IPlatformBridge;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,11 @@ public class MCMessage {
     protected MessageStyle style;
     protected String text = null;
 
-    protected MCMessage(MessageColor color, ColorMode colorMode) {
+    protected MCMessage() {
+        this((MessageColor) null, ColorMode.LOCAL);
+    }
+
+    protected MCMessage(@Nullable MessageColor color, ColorMode colorMode) {
         this(new MessageStyle(color), colorMode);
     }
 
@@ -50,7 +55,7 @@ public class MCMessage {
      * @return A new blank message.
      */
     public static MCMessage blank() {
-        return new MCMessage(MessageColor.WHITE, ColorMode.LOCAL);
+        return new MCMessage();
     }
 
     /**
@@ -294,13 +299,18 @@ public class MCMessage {
 
     public static class MessageStyle {
 
-        private MessageColor color;
+        @Nullable private MessageColor color;
         private boolean obfuscated = false, bold = false, strikethrough = false, underline = false, italic = false, reset = false;
 
-        public MessageStyle(MessageColor color) {
+        public MessageStyle() {
+            this(null);
+        }
+
+        public MessageStyle(@Nullable MessageColor color) {
             this.color = color;
         }
 
+        @Nullable
         public MessageColor getColor() {
             return color;
         }
