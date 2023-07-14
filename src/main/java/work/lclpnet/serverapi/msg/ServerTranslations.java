@@ -21,8 +21,12 @@ public class ServerTranslations {
     private final DefaultLanguageTranslator translator;
 
     public ServerTranslations(ServerCache cache, TranslationLoader translationLoader) {
+        this(cache, new DefaultLanguageTranslator(translationLoader));
+    }
+
+    public ServerTranslations(ServerCache cache, DefaultLanguageTranslator translator) {
         this.cache = cache;
-        this.translator = new DefaultLanguageTranslator(translationLoader);
+        this.translator = translator;
     }
 
     @Nullable
