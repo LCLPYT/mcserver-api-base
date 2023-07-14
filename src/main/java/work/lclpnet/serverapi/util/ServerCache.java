@@ -6,6 +6,7 @@
 
 package work.lclpnet.serverapi.util;
 
+import work.lclpnet.lclpnetwork.ext.LCLPMinecraftAPI;
 import work.lclpnet.lclpnetwork.facade.MCPlayer;
 import work.lclpnet.serverapi.MCServerAPI;
 
@@ -48,7 +49,7 @@ public class ServerCache {
         });
     }
 
-    public CompletableFuture<Void> refreshPlayer(MCServerAPI api, String uuid) {
+    public CompletableFuture<Void> refreshPlayer(LCLPMinecraftAPI api, String uuid) {
         return api.getMCPlayerByUUID(uuid).thenAccept(player -> {
             if (player != null) cachePlayer(player);
         });
